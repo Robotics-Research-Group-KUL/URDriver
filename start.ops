@@ -1,0 +1,8 @@
+########################################
+## Using the standard orocos deployer ##
+
+##load the lua service
+loadService ("Deployer","Lua")
+
+##execute your deployment file
+Lua.exec_file("start.lua")

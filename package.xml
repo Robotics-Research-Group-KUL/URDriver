@@ -1,0 +1,21 @@
+<package>
+  <name>URDriver</name>
+  <version>0.1.0</version>
+  <description>This package contains the components of the URDriver package</description>
+  <maintainer email="gianni.borghesan@gmail.com">Gianni Borghesan</maintainer>
+
+  <license>Unknown</license>
+
+  <url type="website"></url>
+  <!-- <url type="bugtracker"></url> -->
+
+  <author>Gianni Borghesan</author>
+
+  <build_depend>rtt</build_depend>
+  <build_depend>orogen</build_depend>
+  <run_depend>rtt</run_depend>
+
+  <export>
+
+  </export>
+</package>
