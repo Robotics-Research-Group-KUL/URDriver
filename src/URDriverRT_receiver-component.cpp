@@ -2,7 +2,7 @@
 #include <rtt/Component.hpp>
 #include <iostream>
 using namespace RTT;
-URDriverRT_receiver::URDriverRT_receiver(std::string const& name) : TaskContext(name)
+URDriverRT_receiver::URDriverRT_receiver(std::string const& name) : TaskContext(name,PreOperational)
 , v6(6,0.0)
 , prop_adress("192.168.1.102")
 , port_number(30003)

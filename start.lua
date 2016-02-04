@@ -8,7 +8,7 @@ require "lua_messages"
 -- get the deployer --
 tc=rtt.getTC()
 if tc:getName() == "lua" then
-  depl=tc:getPeer("Deployer") 
+  depl=tc:getPeer("Deployer")
 elseif tc:getName() == "Deployer" then
   depl=tc
 end
@@ -33,7 +33,8 @@ depl:loadComponent("URDriverRT_receiver", "URDriverRT_receiver")
 URDriverRT_receiver=depl:getPeer("URDriverRT_receiver")
 depl:loadComponent("URDriver_receiver", "URDriver_receiver")
 URDriver_receiver=depl:getPeer("URDriver_receiver")
-
+depl:loadComponent("URDriver_program", "URDriver_program")
+URDriver_program=depl:getPeer("URDriver_program")
 
 URDriverRT_receiver:setPeriod(0.008)
 
@@ -47,7 +48,12 @@ end
 if not URDriver_receiver:configure() then
   print("failed to conf URDriver_receiver")
 end
---if not URDriverRT_receiver:start()then
---  print("failed to start")
---end
-
+if not URDriver_program:configure() then
+  print("failed to conf URDriver_program")
+end
+if not URDriverRT_receiver:start()then
+  print("failed to start")
+end
+if not URDriver_program:start()then
+  print("failed to start URDriver_program")
+end

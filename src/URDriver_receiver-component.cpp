@@ -2,22 +2,25 @@
 #include <rtt/Component.hpp>
 #include <iostream>
 using namespace RTT;
-URDriver_receiver::URDriver_receiver(std::string const& name) : TaskContext(name)
+URDriver_receiver::URDriver_receiver(std::string const& name) : TaskContext(name,PreOperational)
 , v6(6,0.0)
 , prop_adress("192.168.1.102")
 , port_number(30002)
 {
 	addProperty("port_number",port_number);
 	addProperty("prop_adress",prop_adress);
-	//addPort("q_qctual_outport",q_qctual_outport);
-	//addPort("time_outport",time_outport);
+
+//	addPort("isProgramRunning",isProgramRunning);
+	//addPort("isProgramPaused",isProgramPaused);
+	addPort("bytes_outport",bytes_outport);
+
 	data_pointer=URdata::Ptr(new URdataV31());
 	//q_qctual_outport.setDataSample(v6);
 }
 
 bool URDriver_receiver::configureHook(){
 
-	cout<<"configure"<<endl;
+
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0){
 		Logger::In in(this->getName());
@@ -44,6 +47,7 @@ bool URDriver_receiver::configureHook(){
 
 bool URDriver_receiver::startHook(){
 
+	Logger::In in(this->getName());
 	if( connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
 	{
 		log(Error)<<this->getName()<<": Connection failed!"<< endlog();
@@ -56,8 +60,10 @@ bool URDriver_receiver::startHook(){
 void URDriver_receiver::updateHook(){
 	int bytes_read= data_pointer->readURdata(sockfd);
 	double d;
+	bytes_outport.write(bytes_read);
 	/*bool ok=data_pointer->getQ_actual(v6);
-
+	RTT::OutputPort<bool > isProgramRunning;
+  RTT::OutputPort<bool > isProgramPaused;
 	if (ok)
 		q_qctual_outport.write(v6);
 	ok=data_pointer->getTime(d);

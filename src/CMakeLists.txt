@@ -12,6 +12,7 @@
 #
 orocos_component( URDriverRT_receiver URDriverRT_receiver-component.cpp) # ...you may add multiple source files
 orocos_component( URDriver_receiver URDriver_receiver-component.cpp) # ...you may add multiple source files
+orocos_component( URDriver_program URDriver_program-component.cpp) # ...you may add multiple source files
 
 #
 # You may add multiple orocos_component statements.

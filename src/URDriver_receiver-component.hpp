@@ -35,6 +35,9 @@ class URDriver_receiver : public RTT::TaskContext{
 	vector<double> v6; ///<internal vector of length 6
 	//!@name Ports
 	///@{
+RTT::OutputPort<int > bytes_outport;
+  RTT::OutputPort<bool > isProgramRunning;
+  RTT::OutputPort<bool > isProgramPaused;
 	//RTT::OutputPort<vector<double> > q_qctual_outport;
 	//RTT::OutputPort<double > time_outport;
 	///@}
