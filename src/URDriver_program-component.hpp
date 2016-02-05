@@ -4,37 +4,67 @@
 #include <rtt/RTT.hpp>
 #include "Deserialize.hpp"
 
+
+#define MSG_OUT			1
+#define MSG_QUIT		2
+#define MSG_JOINT_STATES	3
+#define MSG_MOVEJ		4
+#define MSG_WAYPOINT_FINISHED	5
+#define MSG_STOPJ		6
+#define MSG_SERVOJ		7
+#define MSG_SET_PAYLOAD		8
+#define MSG_WRENCH		9
+#define MSG_SET_DIGITAL_OUT	10
+#define MSG_GET_IO		11
+#define MSG_SET_FLAG		12
+#define MSG_SET_TOOL_VOLTAGE	13
+#define MSG_SET_ANALOG_OUT	14
+#define MULT_wrench		10000.0
+#define MULT_payload		1000.0
+#define MULT_jointstate		10000.0
+#define MULT_time		1000000.0
+#define MULT_blend		1000.0
+#define MULT_analog		1000000.0
+
 using namespace std;
 /** Component for programming the robot and interface with the custom data exchanged with the robot.
  * it can send the program to the robot,
  * it open a server to which the robot connects
  */
 class URDriver_program : public RTT::TaskContext{
-  public:
-    URDriver_program(std::string const& name);
-    bool configureHook();
-    bool startHook();
-    void updateHook();
-    void stopHook();
-    void cleanupHook();
-    bool send_program();
-    bool  send_reset_program();
-  private:
+public:
+	URDriver_program(std::string const& name);
+	bool configureHook();
+	bool startHook();
+	void updateHook();
+	void stopHook();
+	void cleanupHook();
+	bool send_program();
+	bool send_reset_program();
+	bool send_joint_objective(vector<double>q, double time);
+	bool open_server();
+private:
+	//this function modifies the data in vec!
+	bool send_out(int vec[],const unsigned int );
 
-    //!@name Properties
-    ///@{
-    int port_number;
-    int reverse_port_number;
-    string prop_adress;
-    ///@}
+	//!@name Properties
+	///@{
+	int port_number;
+	int reverse_port_number;
+	string prop_adress;
+	///@}
+	fd_set         sock;
 
-
-bool ready_to_send_program;
-
-	int sockfd, listenfd;
+	string buffer;
+	bool ready_to_send_program;
+	bool program_sent;
+	bool server_ok;
+	int sockfd, listenfd, newsockfd;
 
 	struct sockaddr_in robot_addr;
 	struct sockaddr_in program_server_addr;
+	struct sockaddr_in cli_addr;
+
 	//struct hostent *server;
 
 
@@ -48,4 +78,27 @@ bool ready_to_send_program;
 
 };
 
+inline int make_socket (uint16_t port)
+{
+	int sock;
+	struct sockaddr_in name;
+
+	/* Create the socket. */
+	sock = socket (PF_INET, SOCK_STREAM, 0);
+	if (sock < 0)
+	{
+		return -1;
+	}
+
+	/* Give the socket a name. */
+	name.sin_family = AF_INET;
+	name.sin_port = htons (port);
+	name.sin_addr.s_addr = htonl (INADDR_ANY);
+	if (bind (sock, (struct sockaddr *) &name, sizeof (name)) < 0)
+	{
+		return -2;
+	}
+
+	return sock;
+}
 #endif

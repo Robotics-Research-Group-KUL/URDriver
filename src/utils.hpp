@@ -67,7 +67,7 @@ template <class T> int swap (T& d)
 	}
 	d=a;
 	return n;
-};
+}
 
 inline bool copyvector( const double vin [],std::vector<double>&vout, int size)
 {

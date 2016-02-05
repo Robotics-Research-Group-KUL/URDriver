@@ -40,6 +40,7 @@ URDriverRT_receiver:setPeriod(0.008)
 
 URDriver_receiver:setPeriod(0.1)
 
+URDriver_program:setPeriod(0.008)
 
 if not URDriverRT_receiver:configure() then
   print("failed to conf URDriverRT_receiver")
@@ -48,12 +49,29 @@ end
 if not URDriver_receiver:configure() then
   print("failed to conf URDriver_receiver")
 end
+
+if not URDriverRT_receiver:start()then
+  print("failed to start")
+end
+
 if not URDriver_program:configure() then
   print("failed to conf URDriver_program")
 end
-if not URDriverRT_receiver:start()then
-  print("failed to start")
+
+if not URDriver_program:send_program()then
+  print("failed to send-program")
+end
+if not URDriver_program:open_server()then
+  print("failed to send-program")
 end
 if not URDriver_program:start()then
   print("failed to start URDriver_program")
 end
+--[[
+cd URDriver_program
+var array q(6)
+q[1]=-1.57
+send_joint_objective (q,10)
+
+
+]]--

@@ -143,6 +143,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named doc
+
+# Build rule for target.
+doc: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 doc
+.PHONY : doc
+
+# fast build rule for target.
+doc/fast:
+	$(MAKE) -f CMakeFiles/doc.dir/build.make CMakeFiles/doc.dir/build
+.PHONY : doc/fast
+
+#=============================================================================
 # Target rules for targets named uninstall
 
 # Build rule for target.
@@ -168,12 +181,52 @@ URDriverRT_receiver/fast:
 	$(MAKE) -f src/CMakeFiles/URDriverRT_receiver.dir/build.make src/CMakeFiles/URDriverRT_receiver.dir/build
 .PHONY : URDriverRT_receiver/fast
 
+#=============================================================================
+# Target rules for targets named URDriver_program
+
+# Build rule for target.
+URDriver_program: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 URDriver_program
+.PHONY : URDriver_program
+
+# fast build rule for target.
+URDriver_program/fast:
+	$(MAKE) -f src/CMakeFiles/URDriver_program.dir/build.make src/CMakeFiles/URDriver_program.dir/build
+.PHONY : URDriver_program/fast
+
+#=============================================================================
+# Target rules for targets named URDriver_receiver
+
+# Build rule for target.
+URDriver_receiver: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 URDriver_receiver
+.PHONY : URDriver_receiver
+
+# fast build rule for target.
+URDriver_receiver/fast:
+	$(MAKE) -f src/CMakeFiles/URDriver_receiver.dir/build.make src/CMakeFiles/URDriver_receiver.dir/build
+.PHONY : URDriver_receiver/fast
+
+#=============================================================================
+# Target rules for targets named swap_test
+
+# Build rule for target.
+swap_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 swap_test
+.PHONY : swap_test
+
+# fast build rule for target.
+swap_test/fast:
+	$(MAKE) -f src/CMakeFiles/swap_test.dir/build.make src/CMakeFiles/swap_test.dir/build
+.PHONY : swap_test/fast
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
+	@echo "... doc"
 	@echo "... edit_cache"
 	@echo "... install"
 	@echo "... install/local"
@@ -182,6 +235,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... uninstall"
 	@echo "... URDriverRT_receiver"
+	@echo "... URDriver_program"
+	@echo "... URDriver_receiver"
+	@echo "... swap_test"
 .PHONY : help
 
 
