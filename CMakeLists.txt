@@ -16,6 +16,9 @@ if (NOT OROCOS-RTT_FOUND)
   message (FATAL_ERROR "\nCould not find Orocos. Please use the shell command\n 'source orocos_toolchain/env.sh' and then run cmake again.")
 endif()
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LEXP REQUIRED libexplain)
+include_directories(include ${LEXP_INCLUDE_DIRS})
 # Defines the orocos_* cmake macros. See that file for additional
 # documentation.
 include( ${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake )

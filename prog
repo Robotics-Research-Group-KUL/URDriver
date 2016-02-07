@@ -8,6 +8,7 @@ def driverProg():
   MSG_WAYPOINT_FINISHED = 5
   MSG_STOPJ = 6
   MSG_SERVOJ = 7
+  MSG_VELJ = 20
   MSG_SET_PAYLOAD = 8
   MSG_WRENCH = 9
   MSG_SET_DIGITAL_OUT = 10
@@ -149,6 +150,17 @@ def driverProg():
         movej(q, a, v, t, r)
         send_waypoint_finished(waypoint_id)
         send_out("movej finished")
+      elif mtype == MSG_VELJ:
+      	q = [params_movej[1] / MULT_jointstate,
+                   params_movej[2] / MULT_jointstate,
+                   params_movej[3] / MULT_jointstate,
+                   params_movej[4] / MULT_jointstate,
+                   params_movej[5] / MULT_jointstate,
+                   params_movej[6] / MULT_jointstate]
+        a = params_movej[7] / MULT_jointstate
+        t = params_movej[8] / MULT_time
+      	speedj(qd, a, t)
+       
       elif mtype == MSG_SERVOJ:
         # Reads the parameters
         params_servoj = socket_read_binary_integer(1+6+1)

@@ -3,13 +3,14 @@
 #include <iostream>
 #include <fstream>      // std::ifstream
 #include "utils.hpp"      // std::ifstream
-//#include <libexplain/bind.h>
+#include <libexplain/bind.h>
 using namespace RTT;
 URDriver_program::URDriver_program(std::string const& name) : TaskContext(name,PreOperational)
       , prop_adress("192.168.1.102")
       , port_number(30002)
       , ready_to_send_program(false)
       , reverse_port_number(50001)
+      , qdes(6,0.0)
 {
 	addProperty("port_number",port_number);
 	addProperty("reverse_port_number",reverse_port_number);
@@ -22,11 +23,28 @@ URDriver_program::URDriver_program(std::string const& name) : TaskContext(name,P
 	addOperation("open_server",
 		     &URDriver_program::open_server, this, RTT::OwnThread);
 
+	addOperation("start_send_velocity",
+		     &URDriver_program::start_send_velocity, this, RTT::OwnThread);
+	addOperation("stop_send_velocity",
+		     &URDriver_program::stop_send_velocity, this, RTT::OwnThread);
+
+
+	addEventPort("qdes_inport",qdes_inport);
+
 	/* */
 
 	buffer.reserve(1024);
 	server_ok=false;
+	sending_velocity=false;
 }
+
+bool URDriver_program::start_send_velocity(){
+	sending_velocity=true;
+}
+bool URDriver_program::stop_send_velocity(){
+	sending_velocity=false;
+}
+
 
 bool URDriver_program::configureHook(){
 
@@ -68,6 +86,8 @@ bool URDriver_program::configureHook(){
 	int yes=1;
 	//char yes='1'; // use this under Solaris
 
+
+	//TODO take these lines out...
 	if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1) {
 		cout<<"error setsockopt"<<endl;
 		return false;
@@ -90,9 +110,13 @@ bool URDriver_program::configureHook(){
 	if(bind_ret< 0)
 	{
 		Logger::In in(this->getName());
+		char message[3000];
+		explain_message_bind(message, sizeof(message),
+				     listenfd, (struct sockaddr*)&program_server_addr, sizeof(program_server_addr));
 		log(Error)<<this->getName()<<": error binding socket server.\n"
 			 <<"bind ret: "<<bind_ret<<
-			   "\nerrno "<<errno<< endlog();
+			   "\nerrno: "<<errno<<
+			   "\nMessage:"<<message<<endlog();
 
 		return false;
 	}
@@ -139,8 +163,40 @@ bool URDriver_program::startHook(){
 	//return server_ok;
 }
 
+
+
+
+
 void URDriver_program::updateHook(){
 
+
+	if(sending_velocity)
+	{
+
+		if(qdes_inport.read(qdes)!=NoData)
+		{
+			if (qdes.size()!=6)
+				Logger::In in(this->getName());
+			log(Error)<<this->getName()<<": error size of q in port "<<qdes_inport.getName()<<".\n STOPPING."<< endlog();
+			this->stop();
+
+		}
+		int data_frame[9];
+		double time=getPeriod()*0.75;//make the function on robot side returns before he get new data
+		data_frame[0]=MSG_VELJ;
+		for (int i=0;i<6;i++)
+			data_frame[1+i]=(int)(qdes[i]*MULT_jointstate);
+		data_frame[7]=(int)(0.1*MULT_jointstate);//max acc
+		data_frame[8]=(int)(time*MULT_time);//time
+		if (!send_out(data_frame,9))
+		{
+			Logger::In in(this->getName());
+			log(Error)<<this->getName()<<": error send_joint_velocity. STOPPING."<< endlog();
+			this->stop();
+			return;
+		}
+
+	}
 
 	struct timeval timeout = {0, 0};   // polling
 
@@ -149,13 +205,13 @@ void URDriver_program::updateHook(){
 	int retval = select(newsockfd+1, &read_fd_set, NULL, NULL, &timeout);
 	if (retval <= 0)
 	{
-		cout<<"retval "<<retval<<endl;
+		//cout<<"retval "<<retval<<endl;
 		return;
 	}
 	else// the socket has data
 	{
 
-		cout<<"retval ok "<<retval<<endl;
+
 		int msg_type;
 		int n = read(newsockfd,& msg_type, sizeof(msg_type));
 		swap(msg_type);
@@ -164,6 +220,7 @@ void URDriver_program::updateHook(){
 			Logger::In in(this->getName());
 			log(Error)<<this->getName()<<": error in read, stopping."<< endlog();
 			this->stop();
+			return;
 		}
 		switch(msg_type){
 		case MSG_WAYPOINT_FINISHED:
@@ -190,7 +247,7 @@ void URDriver_program::updateHook(){
 			cout<<"MSG_QUIT"<<endl;
 			break;
 		default:
-			cout<<"ERROR"<<endl;
+			cout<<"ERROR IN MSG_TYPE"<<endl;
 		}
 	}
 

@@ -26,6 +26,7 @@
 #define MULT_blend		1000.0
 #define MULT_analog		1000000.0
 
+#define MSG_VELJ		20
 using namespace std;
 /** Component for programming the robot and interface with the custom data exchanged with the robot.
  * it can send the program to the robot,
@@ -43,10 +44,13 @@ public:
 	bool send_reset_program();
 	bool send_joint_objective(vector<double>q, double time);
 	bool open_server();
+	bool start_send_velocity();
+	bool stop_send_velocity();
 private:
 	//this function modifies the data in vec!
 	bool send_out(int vec[],const unsigned int );
 
+	bool sending_velocity;
 	//!@name Properties
 	///@{
 	int port_number;
@@ -72,6 +76,8 @@ private:
 
 	//!@name Ports
 	///@{
+	RTT::InputPort<vector<double> > qdes_inport;
+	vector<double>  qdes;
 	//RTT::OutputPort<vector<double> > q_qctual_outport;
 	//RTT::OutputPort<double > time_outport;
 	///@}
