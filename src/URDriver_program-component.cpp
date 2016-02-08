@@ -4,6 +4,7 @@
 #include <fstream>      // std::ifstream
 #include "utils.hpp"      // std::ifstream
 #include <libexplain/bind.h>
+#include <signal.h>
 using namespace RTT;
 URDriver_program::URDriver_program(std::string const& name) : TaskContext(name,PreOperational)
       , prop_adress("192.168.1.102")
@@ -11,6 +12,9 @@ URDriver_program::URDriver_program(std::string const& name) : TaskContext(name,P
       , ready_to_send_program(false)
       , reverse_port_number(50001)
       , qdes(6,0.0)
+      , velocity_apl(0.4)
+      , acc_limit(1)
+      , freq(1.0)
 {
 	addProperty("port_number",port_number);
 	addProperty("reverse_port_number",reverse_port_number);
@@ -33,9 +37,19 @@ URDriver_program::URDriver_program(std::string const& name) : TaskContext(name,P
 
 	/* */
 
+
+	//test stuff
+	addProperty("velocity_apl",velocity_apl);
+	addProperty("acc_limit",acc_limit);
+	addProperty("freq",freq);
+
+
 	buffer.reserve(1024);
 	server_ok=false;
 	sending_velocity=false;
+
+
+
 }
 
 bool URDriver_program::start_send_velocity(){
@@ -45,7 +59,10 @@ bool URDriver_program::stop_send_velocity(){
 	sending_velocity=false;
 }
 
+void signal_callback_handler(int signum){
 
+	printf("Caught signal SIGPIPE %d\n",signum);
+}
 bool URDriver_program::configureHook(){
 
 	ready_to_send_program=false;
@@ -88,14 +105,14 @@ bool URDriver_program::configureHook(){
 
 
 	//TODO take these lines out...
-	if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1) {
+	/*if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1) {
 		cout<<"error setsockopt"<<endl;
 		return false;
 	}
 	if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEPORT, &yes, sizeof(yes)) == -1) {
 		cout<<"error setsockopt 2"<<endl;
 		return false;
-	}
+	}*/
 
 
 	bzero((char *) &program_server_addr, sizeof(program_server_addr));
@@ -120,6 +137,8 @@ bool URDriver_program::configureHook(){
 
 		return false;
 	}
+
+
 	return true;
 }
 bool URDriver_program::open_server()
@@ -158,7 +177,8 @@ bool URDriver_program::open_server()
 bool URDriver_program::startHook(){
 
 
-
+	time_now=0;
+	qdes[4]=0;
 	return true;
 	//return server_ok;
 }
@@ -169,29 +189,33 @@ bool URDriver_program::startHook(){
 
 void URDriver_program::updateHook(){
 
-
+	signal(SIGPIPE, signal_callback_handler);
 	if(sending_velocity)
 	{
 
-		if(qdes_inport.read(qdes)!=NoData)
+		/*if(qdes_inport.read(qdes)!=NoData)
 		{
 			if (qdes.size()!=6)
 				Logger::In in(this->getName());
 			log(Error)<<this->getName()<<": error size of q in port "<<qdes_inport.getName()<<".\n STOPPING."<< endlog();
 			this->stop();
 
-		}
+
+		}*/
+
 		int data_frame[9];
-		double time=getPeriod()*0.75;//make the function on robot side returns before he get new data
+		double time=getPeriod()*0.5;//make the function on robot side returns before he get new data
+		time_now+=getPeriod();
+		qdes[4]=sin(time_now*3.14*freq)*velocity_apl;
 		data_frame[0]=MSG_VELJ;
 		for (int i=0;i<6;i++)
 			data_frame[1+i]=(int)(qdes[i]*MULT_jointstate);
-		data_frame[7]=(int)(0.1*MULT_jointstate);//max acc
+		data_frame[7]=(int)(acc_limit*MULT_jointstate);//max acc
 		data_frame[8]=(int)(time*MULT_time);//time
 		if (!send_out(data_frame,9))
 		{
 			Logger::In in(this->getName());
-			log(Error)<<this->getName()<<": error send_joint_velocity. STOPPING."<< endlog();
+			log(Error)<<this->getName()<<": error send_joint_velocity. ."<< endlog();
 			this->stop();
 			return;
 		}
@@ -306,11 +330,11 @@ void URDriver_program::cleanupHook() {
 	close(listenfd);
 	close(newsockfd);
 	close(sockfd);
-
+	//sigaction (SIGPIPE, &old_actn, NULL);
 }
 bool  URDriver_program::send_program(){
 	//if (!ready_to_send_program) return false;
-	std::ifstream t("prog");
+	std::ifstream t("prog.ur");
 	std::stringstream buffer;
 	buffer << t.rdbuf();
 	string program=buffer.str();
@@ -325,7 +349,7 @@ bool  URDriver_program::send_program(){
 bool  URDriver_program::send_reset_program(){
 	//if (!ready_to_send_program) return false;
 	string reset_program=
-			"def resetProg():\n"
+			"def resetProg():\n"//"popup(\"reset\")\n"
 			"sleep(0.1)\n"
 			"end\n";
 	int bytes=send(sockfd,reset_program.c_str(),reset_program.length(),0);

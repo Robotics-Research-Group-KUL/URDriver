@@ -56,6 +56,9 @@ private:
 	int port_number;
 	int reverse_port_number;
 	string prop_adress;
+	double velocity_apl;
+	double acc_limit;
+	double freq;
 	///@}
 	fd_set         sock;
 
@@ -72,7 +75,7 @@ private:
 	//struct hostent *server;
 
 
-
+double time_now;
 
 	//!@name Ports
 	///@{
