@@ -105,14 +105,14 @@ bool URDriver_program::configureHook(){
 
 
 	//TODO take these lines out...
-	/*if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1) {
+	if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1) {
 		cout<<"error setsockopt"<<endl;
 		return false;
 	}
 	if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEPORT, &yes, sizeof(yes)) == -1) {
 		cout<<"error setsockopt 2"<<endl;
 		return false;
-	}*/
+	}
 
 
 	bzero((char *) &program_server_addr, sizeof(program_server_addr));
