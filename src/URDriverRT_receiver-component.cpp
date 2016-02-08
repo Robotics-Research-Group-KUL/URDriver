@@ -9,10 +9,11 @@ URDriverRT_receiver::URDriverRT_receiver(std::string const& name) : TaskContext(
 {
 	addProperty("port_number",port_number);
 	addProperty("prop_adress",prop_adress);
-	addPort("q_qctual_outport",q_qctual_outport);
+	addPort("q_actual_outport",q_actual_outport);
+	addPort("qd_actual_outport",qd_actual_outport);
 	addPort("time_outport",time_outport);
 	data_pointer=RTdata::Ptr(new RTdataV31());
-	q_qctual_outport.setDataSample(v6);
+	q_actual_outport.setDataSample(v6);
 }
 
 bool URDriverRT_receiver::configureHook(){
@@ -55,15 +56,17 @@ bool URDriverRT_receiver::startHook(){
 
 void URDriverRT_receiver::updateHook(){
 	int bytes_read= data_pointer->readRTData(sockfd);
+	//todo control on numer of reads
 	double d;
-	bool ok=data_pointer->getQ_actual(v6);
 
-	if (ok)
-		q_qctual_outport.write(v6);
+	int ok=data_pointer->getQ_actual(v6);
+	if (ok==1) q_actual_outport.write(v6);
+
+	ok=data_pointer->getQdot_actual(v6);
+	if (ok==1) qd_actual_outport.write(v6);
+
 	ok=data_pointer->getTime(d);
-
-	if (ok)
-		time_outport.write(d);
+	if (ok==1) time_outport.write(d);
 }
 
 void URDriverRT_receiver::stopHook() {

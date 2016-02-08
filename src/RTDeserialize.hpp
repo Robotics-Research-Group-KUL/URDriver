@@ -45,9 +45,11 @@ public:
 	 */
 	virtual int getSize(int  &t)const{t=size; return 1;}
 	///Getter function for time
-	virtual int getTime  ( double&t)const {return -1;};
+	virtual int getTime  ( double&t)const {return -1;}
 	///Getter function for joint value
-	virtual int getQ_actual  ( vector<double>&t)const {return -1;};
+	virtual int getQ_actual  ( vector<double>&t)const {return -1;}
+	///Getter function for joint velocity value
+	virtual int getQdot_actual  ( vector<double>&t)const {return -1;}
 	///@}
 
 };
@@ -61,9 +63,11 @@ class RTdataV31:public RTdata
 {
 public:
 	RTdataV31(){size=1044;type="3.0 and 3.1";};
-	int getTime  ( double&t)const {t=data.Time;return 1;};
+	int getTime  ( double&t)const {t=data.Time;return 1;}
 	int getQ_actual  ( vector<double>&q)const
-	{if (copyvector(data.q_actual,q,6)) return 1; return 0;};
+	{if (copyvector(data.q_actual,q,6)) return 1; return 0;}
+	int getQdot_actual  ( vector<double>&qd)const
+	{if (copyvector(data.qd_actual,qd,6)) return 1; return 0;}
 
 
 	/**

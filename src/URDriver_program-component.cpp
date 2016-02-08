@@ -204,7 +204,7 @@ void URDriver_program::updateHook(){
 		}*/
 
 		int data_frame[9];
-		double time=getPeriod()*0.5;//make the function on robot side returns before he get new data
+		double time=getPeriod()*1;//make the function on robot side returns before he get new data
 		time_now+=getPeriod();
 		qdes[4]=sin(time_now*3.14*freq)*velocity_apl;
 		data_frame[0]=MSG_VELJ;
@@ -215,7 +215,7 @@ void URDriver_program::updateHook(){
 		if (!send_out(data_frame,9))
 		{
 			Logger::In in(this->getName());
-			log(Error)<<this->getName()<<": error send_joint_velocity. ."<< endlog();
+			log(Error)<<this->getName()<<": error send_joint_velocity. STOPPING."<< endlog();
 			this->stop();
 			return;
 		}
