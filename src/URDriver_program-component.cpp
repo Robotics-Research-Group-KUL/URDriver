@@ -12,8 +12,8 @@ URDriver_program::URDriver_program(std::string const& name) : TaskContext(name,P
       , ready_to_send_program(false)
       , reverse_port_number(50001)
       , qdes(6,0.0)
-      , velocity_apl(0.4)
-      , acc_limit(1)
+      , velocity_apl(0.6)
+      , acc_limit(4)
       , freq(1.0)
 {
 	addProperty("port_number",port_number);
@@ -241,9 +241,9 @@ void URDriver_program::updateHook(){
 		swap(msg_type);
 		if  (n <= 0)
 		{
-			Logger::In in(this->getName());
+		/*	Logger::In in(this->getName());
 			log(Error)<<this->getName()<<": error in read, stopping."<< endlog();
-			this->stop();
+			this->stop();*/
 			return;
 		}
 		switch(msg_type){
@@ -254,7 +254,7 @@ void URDriver_program::updateHook(){
 			cout<<"way_point: "<<way_point<<endl;
 			break;
 		case MSG_OUT:
-			cout<<"MSG_OUT"<<endl;
+			//cout<<"MSG_OUT"<<endl;
 			buffer.clear();
 			char c;
 			int i;
@@ -264,7 +264,7 @@ void URDriver_program::updateHook(){
 				if (c=='~')
 					break;
 			}
-			cout<<buffer<<endl;
+			//cout<<buffer<<endl;
 
 			break;
 		case MSG_QUIT:

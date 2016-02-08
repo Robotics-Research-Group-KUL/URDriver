@@ -40,7 +40,7 @@ URDriverRT_receiver:setPeriod(0.008)
 
 URDriver_receiver:setPeriod(0.1)
 
-URDriver_program:setPeriod(0.008)
+URDriver_program:setPeriod(0.004)
 
 if not URDriverRT_receiver:configure() then
   print("failed to conf URDriverRT_receiver")
