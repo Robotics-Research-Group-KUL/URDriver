@@ -1,3 +1,5 @@
+#ifndef SRC_DESERIALIZE_STRUCTS_HPP_
+#define SRC_DESERIALIZE_STRUCTS_HPP_
 #pragma pack(1)
 	struct data_package_descriptor{
 	int packageSize;
@@ -42,3 +44,4 @@
 		data_joint_single joint[6];
 	};
 #pragma pack(0)
+#endif

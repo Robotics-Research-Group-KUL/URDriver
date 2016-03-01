@@ -87,7 +87,7 @@ public:
 class URdataV31:public URdata
 {
 public:
-	URdataV31(){type="3.1";};
+	URdataV31(){type="3.1";}
 	robot_mode_v31 robot_mode_value;
 	joints joints_value;
 	char buffer[4096];

@@ -54,9 +54,24 @@ URDriver_program::URDriver_program(std::string const& name) : TaskContext(name,P
 
 bool URDriver_program::start_send_velocity(){
 	sending_velocity=true;
+	return true;
 }
 bool URDriver_program::stop_send_velocity(){
+	int data_frame[9];
+	data_frame[0]=MSG_VELJ;
+	for (int i=0;i<6;i++)
+		data_frame[1+i]=0;
+	data_frame[7]=(int)(acc_limit*MULT_jointstate);//max acc
+	data_frame[8]=(int)(getPeriod()*MULT_time);//time
+	if (!send_out(data_frame,9))
+	{
+		Logger::In in(this->getName());
+		log(Error)<<this->getName()<<": error send_joint_velocity. STOPPING."<< endlog();
+		this->stop();
+		return false;
+	}
 	sending_velocity=false;
+	return true;
 }
 
 void signal_callback_handler(int signum){

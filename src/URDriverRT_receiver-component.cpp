@@ -14,6 +14,12 @@ URDriverRT_receiver::URDriverRT_receiver(std::string const& name) : TaskContext(
 	addPort("time_outport",time_outport);
 	data_pointer=RTdata::Ptr(new RTdataV31());
 	q_actual_outport.setDataSample(v6);
+
+
+	act = new RTT::extras::FileDescriptorActivity(os::HighestPriority);
+	this->setActivity(act);
+	act = dynamic_cast<RTT::extras::FileDescriptorActivity*>(this->getActivity());
+
 }
 
 bool URDriverRT_receiver::configureHook(){
@@ -30,6 +36,7 @@ bool URDriverRT_receiver::configureHook(){
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_port=htons(port_number);
 
+
 	//Convert from presentation format to an Internet number
 	if(inet_pton(AF_INET, prop_adress.c_str(), &serv_addr.sin_addr)<=0)
 	{
@@ -45,32 +52,71 @@ bool URDriverRT_receiver::configureHook(){
 
 bool URDriverRT_receiver::startHook(){
 
+
 	if( connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
 	{
+		Logger::In in(this->getName());
 		log(Error)<<this->getName()<<": Connection failed!"<< endlog();
 		return false;
 	}
 	log(Info)<<this->getName()<<": Connection OK!"<< endlog();
+	//activity set watch
+	act->watch(sockfd);
+	act->setTimeout(2000);
+
 	return true;
 }
 
-void URDriverRT_receiver::updateHook(){
-	int bytes_read= data_pointer->readRTData(sockfd);
-	//todo control on numer of reads
-	double d;
+void URDriverRT_receiver::updateHook()
+{
 
-	int ok=data_pointer->getQ_actual(v6);
-	if (ok==1) q_actual_outport.write(v6);
 
-	ok=data_pointer->getQdot_actual(v6);
-	if (ok==1) qd_actual_outport.write(v6);
+	if(act->hasError()){
+		Logger::In in(this->getName());
+		log(Error)  <<this->getName()<<" socket error - unwatching all sockets. restart the component" << endlog();
+		act->clearAllWatches();
+		close(sockfd);
+		this->stop();
+		this->cleanup();
+	}
+	else if (act->hasTimeout()){
+		Logger::In in(this->getName());
+		log(Error)  <<this->getName()<<" socket timeout" << endlog();
 
-	ok=data_pointer->getTime(d);
-	if (ok==1) time_outport.write(d);
+	}
+	else{
+		if(act->isUpdated(sockfd)){
+
+
+			int bytes_read= data_pointer->readRTData(sockfd);
+			//todo control on numer of reads
+			double d;
+
+			if (bytes_read==0) return;
+			int ok=data_pointer->getQ_actual(v6);
+			if (ok==1) q_actual_outport.write(v6);
+
+			ok=data_pointer->getQdot_actual(v6);
+			if (ok==1) qd_actual_outport.write(v6);
+
+			ok=data_pointer->getTime(d);
+			if (ok==1) time_outport.write(d);
+
+#ifndef NDEBUG
+			cout<<"bites read:\t" << bytes_read <<endl;
+			cout<<"time:\t"<<d<<endl;
+#endif
+
+
+
+		}
+
+	}
 }
 
 void URDriverRT_receiver::stopHook() {
-
+ act->clearAllWatches();
+ close(sockfd);
 }
 
 void URDriverRT_receiver::cleanupHook() {

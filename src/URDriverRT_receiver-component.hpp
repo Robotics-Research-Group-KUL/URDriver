@@ -3,6 +3,7 @@
 
 #include <rtt/RTT.hpp>
 #include "RTDeserialize.hpp"
+#include <rtt/extras/FileDescriptorActivity.hpp>
 
 using namespace std;
 
@@ -23,7 +24,7 @@ class URDriverRT_receiver : public RTT::TaskContext{
     string prop_adress;
     ///@}
 
-
+	RTT::extras::FileDescriptorActivity* act;
 	int sockfd;
 
 	struct sockaddr_in serv_addr;

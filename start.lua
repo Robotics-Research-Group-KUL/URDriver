@@ -2,7 +2,6 @@
 require "rttlib"
 require "rttros"
 
-require "lua_messages"
 
 ----------------------
 -- get the deployer --
@@ -38,11 +37,11 @@ URDriver_receiver=depl:getPeer("URDriver_receiver")
 depl:loadComponent("URDriver_program", "URDriver_program")
 URDriver_program=depl:getPeer("URDriver_program")
 
-URDriverRT_receiver:setPeriod(0.008)
+--URDriverRT_receiver:setPeriod(0.008)
 
 URDriver_receiver:setPeriod(0.1)
 
-URDriver_program:setPeriod(0.004)
+URDriver_program:setPeriod(0.008)
 
 if not URDriverRT_receiver:configure() then
   print("failed to conf URDriverRT_receiver")
