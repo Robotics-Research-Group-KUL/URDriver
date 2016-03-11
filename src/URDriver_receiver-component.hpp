@@ -3,27 +3,27 @@
 
 #include <rtt/RTT.hpp>
 #include "Deserialize.hpp"
-
+#include <rtt/extras/FileDescriptorActivity.hpp>
 using namespace std;
 
 class URDriver_receiver : public RTT::TaskContext{
-  public:
-    URDriver_receiver(std::string const& name);
-    bool configureHook();
-    bool startHook();
-    void updateHook();
-    void stopHook();
-    void cleanupHook();
+public:
+	URDriver_receiver(std::string const& name);
+	bool configureHook();
+	bool startHook();
+	void updateHook();
+	void stopHook();
+	void cleanupHook();
 
-  private:
+private:
 
-    //!@name Properties
-    ///@{
-    int port_number;
-    string prop_adress;
-    ///@}
+	//!@name Properties
+	///@{
+	int port_number;
+	string prop_adress;
+	///@}
 
-
+	RTT::extras::FileDescriptorActivity* act;
 	int sockfd;
 
 	struct sockaddr_in serv_addr;
@@ -33,13 +33,13 @@ class URDriver_receiver : public RTT::TaskContext{
 	URdata::Ptr data_pointer;
 
 	vector<double> v6; ///<internal vector of length 6
-	//!@name Ports
+	RTT::OutputPort<int > bytes_outport;
+
+	//!@name Ports in service robot_mode_value
 	///@{
-RTT::OutputPort<int > bytes_outport;
-  RTT::OutputPort<bool > isProgramRunning;
-  RTT::OutputPort<bool > isProgramPaused;
-	//RTT::OutputPort<vector<double> > q_qctual_outport;
-	//RTT::OutputPort<double > time_outport;
+	RTT::OutputPort<bool > isProgramRunning;
+	RTT::OutputPort<bool > isProgramPaused;
+	RTT::OutputPort<bool > IsEmergencyStopped;
 	///@}
 
 };

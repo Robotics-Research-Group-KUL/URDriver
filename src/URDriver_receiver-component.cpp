@@ -10,12 +10,21 @@ URDriver_receiver::URDriver_receiver(std::string const& name) : TaskContext(name
 	addProperty("port_number",port_number);
 	addProperty("prop_adress",prop_adress);
 
-//	addPort("isProgramRunning",isProgramRunning);
-	//addPort("isProgramPaused",isProgramPaused);
+	/// robot_mode_value
+	this->provides("robot_mode_value")->doc("Ports giving access to the state of the robot.");
+	this->provides("robot_mode_value")->addPort("isProgramRunning",isProgramRunning);
+	this->provides("robot_mode_value")->addPort("isProgramPaused",isProgramPaused);
+	this->provides("robot_mode_value")->addPort("IsEmergencyStopped",IsEmergencyStopped);
+
 	addPort("bytes_outport",bytes_outport);
 
 	data_pointer=URdata::Ptr(new URdataV31());
 	//q_qctual_outport.setDataSample(v6);
+
+
+	act = new RTT::extras::FileDescriptorActivity(os::HighestPriority);
+	this->setActivity(act);
+	act = dynamic_cast<RTT::extras::FileDescriptorActivity*>(this->getActivity());
 }
 
 bool URDriver_receiver::configureHook(){
@@ -54,32 +63,52 @@ bool URDriver_receiver::startHook(){
 		return false;
 	}
 	log(Info)<<this->getName()<<": Connection OK!"<< endlog();
+	act->watch(sockfd);
+	act->setTimeout(2000);
+
 	return true;
 }
 
 void URDriver_receiver::updateHook(){
-	int bytes_read= data_pointer->readURdata(sockfd);
-	double d;
-	bytes_outport.write(bytes_read);
-	/*bool ok=data_pointer->getQ_actual(v6);
-	RTT::OutputPort<bool > isProgramRunning;
-  RTT::OutputPort<bool > isProgramPaused;
-	if (ok)
-		q_qctual_outport.write(v6);
-	ok=data_pointer->getTime(d);
+	if(act->hasError()){
+		Logger::In in(this->getName());
+		log(Error)  <<this->getName()<<" socket error - unwatching all sockets. restart the component" << endlog();
+		act->clearAllWatches();
+		close(sockfd);
+		this->stop();
+		this->cleanup();
+	}
+	else if (act->hasTimeout()){
+		Logger::In in(this->getName());
+		log(Error)  <<this->getName()<<" socket timeout" << endlog();
 
-	if (ok)
-		time_outport.write(d);*/
+	}
+	else{
+		if(act->isUpdated(sockfd)){
+
+			int bytes_read= data_pointer->readURdata(sockfd);
+
+			bytes_outport.write(bytes_read);
+			bool ret;
+			if (data_pointer->getIsProgramRunning(ret))
+				isProgramRunning.write(ret);
+			if (data_pointer->getIsProgramPaused(ret))
+				isProgramPaused.write(ret);
+			if (data_pointer->getIsEmergencyStopped(ret))
+				IsEmergencyStopped.write(ret);
+
+
+		}
+	}
 }
-
 void URDriver_receiver::stopHook() {
-
+	act->clearAllWatches();
+	close(sockfd);
 }
 
 void URDriver_receiver::cleanupHook() {
 
 }
-
 /*
  * Using this macro, only one component may live
  * in one library *and* you may *not* link this library

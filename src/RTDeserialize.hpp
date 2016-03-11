@@ -28,8 +28,12 @@ public:
 	typedef boost::shared_ptr<RTdata> Ptr;
 	virtual ~RTdata(){}
 
-
-
+	/**
+	 * @brief read the data structure from the data
+	 * @param sockfd socket descriptor
+	 * @return  negative with an error (to be doumented in specific implementations)
+	 *		otherwise the bytes read
+	 */
 	virtual int readRTData(int)=0;
 	/** @name Getter functions
 	 *  These functions all returns false if they are not

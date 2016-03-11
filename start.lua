@@ -39,9 +39,9 @@ URDriver_program=depl:getPeer("URDriver_program")
 
 --URDriverRT_receiver:setPeriod(0.008)
 
-URDriver_receiver:setPeriod(0.1)
+--URDriver_receiver:setPeriod(0.1)
 
-URDriver_program:setPeriod(0.008)
+URDriver_program:setPeriod(0.004)
 
 if not URDriverRT_receiver:configure() then
   print("failed to conf URDriverRT_receiver")
@@ -50,7 +50,7 @@ end
 if not URDriver_receiver:configure() then
   print("failed to conf URDriver_receiver")
 end
-
+--[[
 if not URDriverRT_receiver:start()then
   print("failed to start")
 end
@@ -68,7 +68,7 @@ end
 if not URDriver_program:start()then
   print("failed to start URDriver_program")
 end
---[[
+
 cd URDriver_program
 var array q(6)
 q[1]=-1.57
