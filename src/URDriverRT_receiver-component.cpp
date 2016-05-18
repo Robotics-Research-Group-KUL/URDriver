@@ -12,6 +12,7 @@ URDriverRT_receiver::URDriverRT_receiver(std::string const& name) : TaskContext(
 	addPort("q_actual_outport",q_actual_outport);
 	addPort("qd_actual_outport",qd_actual_outport);
 	addPort("time_outport",time_outport);
+	addPort("period_outport",period_outport);
 	data_pointer=RTdata::Ptr(new RTdataV31());
 	q_actual_outport.setDataSample(v6);
 
@@ -63,14 +64,15 @@ bool URDriverRT_receiver::startHook(){
 	//activity set watch
 	act->watch(sockfd);
 	act->setTimeout(2000);
-
+	m_time_begin = os::TimeService::Instance()->getTicks();
 	return true;
 }
 
 void URDriverRT_receiver::updateHook()
 {
-
-
+	m_time_passed = os::TimeService::Instance()->secondsSince(m_time_begin);
+	m_time_begin = os::TimeService::Instance()->getTicks();
+	period_outport.write(m_time_passed);
 	if(act->hasError()){
 		Logger::In in(this->getName());
 		log(Error)  <<this->getName()<<" socket error - unwatching all sockets. restart the component" << endlog();
