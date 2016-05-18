@@ -1,6 +1,6 @@
 def driverProg():
-  HOSTNAME = "192.168.1.101"
-  PORT = 50001
+  HOSTNAME = "$HOSTNAME$"
+  PORT = $PortNumber$
   MSG_OUT = 1
   MSG_QUIT = 2
   MSG_JOINT_STATES = 3
@@ -24,7 +24,11 @@ def driverProg():
   pi = 3.14159265359
   
   MSG_VELJ=20
+
+  popup("NEW PROGRAM")
   
+
+
   def send_out(msg):
     enter_critical
     socket_send_int(MSG_OUT)
@@ -122,8 +126,11 @@ def driverProg():
       #textmsg("here")
       # Executes the command
       if state == Speed_RUNNING:
-        
+        #movej(qd)
         speedj(qd, a, dt)
+        #textmsg("qd ", qd[0])
+        #textmsg("a ", a)
+        #textmsg("dt ", dt)
         #send_out("Servoed")
       else:
         #send_out("Idle")
@@ -197,6 +204,7 @@ def driverProg():
         send_out("movej finished")
       elif mtype == MSG_VELJ:
         params_velj = socket_read_binary_integer(8)
+        #  textmsg("Received" ,params_velj[1])
         if params_velj[0] != 8:
           textmsg("Received" ,params_velj[0])
         else:

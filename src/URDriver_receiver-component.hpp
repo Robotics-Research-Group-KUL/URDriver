@@ -2,7 +2,7 @@
 #define OROCOS_URDriver_COMPONENT_HPP
 
 #include <rtt/RTT.hpp>
-#include "Deserialize.hpp"
+#include "URDriver/Deserialize.hpp"
 #include <rtt/extras/FileDescriptorActivity.hpp>
 using namespace std;
 

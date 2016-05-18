@@ -2,8 +2,8 @@
 #define OROCOS_URDriverRT_dummy_server_COMPONENT_HPP
 
 #include <rtt/RTT.hpp>
-#include "RTDeserialize.hpp"
-
+#include "URDriver/RTDeserialize.hpp"
+#include "URDriver/utils.hpp"
 #pragma pack(1)
 	struct data_struct{
 		int Message_Size;
@@ -87,27 +87,5 @@ private:
 
 };
 
-inline int make_socket (uint16_t port)
-{
-	int sock;
-	struct sockaddr_in name;
 
-	/* Create the socket. */
-	sock = socket (PF_INET, SOCK_STREAM, 0);
-	if (sock < 0)
-	{
-		return -1;
-	}
-
-	/* Give the socket a name. */
-	name.sin_family = AF_INET;
-	name.sin_port = htons (port);
-	name.sin_addr.s_addr = htonl (INADDR_ANY);
-	if (bind (sock, (struct sockaddr *) &name, sizeof (name)) < 0)
-	{
-		return -2;
-	}
-
-	return sock;
-}
 #endif

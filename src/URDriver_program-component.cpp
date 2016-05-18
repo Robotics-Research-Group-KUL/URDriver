@@ -2,9 +2,10 @@
 #include <rtt/Component.hpp>
 #include <iostream>
 #include <fstream>      // std::ifstream
-#include "utils.hpp"      // std::ifstream
+#include "URDriver/utils.hpp"      // std::ifstream
 #include <libexplain/bind.h>
 #include <signal.h>
+#include <string>     // std::string, std::to_string
 using namespace RTT;
 URDriver_program::URDriver_program(std::string const& name) : TaskContext(name,PreOperational)
       , prop_adress("192.168.1.102")
@@ -12,13 +13,19 @@ URDriver_program::URDriver_program(std::string const& name) : TaskContext(name,P
       , ready_to_send_program(false)
       , reverse_port_number(50001)
       , qdes(6,0.0)
-      , velocity_apl(0.6)
-      , acc_limit(4)
-      , freq(1.0)
+	  , velocity_apl(0.1)
+	  , acc_limit(100000.0)
+	  , freq(1.0)
+	  , timeStepMultiplier(3.0)
+	  , my_adress("127.0.0.1")
+	  , program_file("prog.ur")
 {
 	addProperty("port_number",port_number);
 	addProperty("reverse_port_number",reverse_port_number);
-	addProperty("prop_adress",prop_adress).doc("ip address robot");
+	addProperty("prop_adress",prop_adress).doc("ip address robot.");
+	addProperty("my_adress",my_adress).doc("ip address this pc.");
+	addProperty("program_file",program_file).doc("file containing the program to be send to the robot.");
+	addProperty("timeStepMultiplier",timeStepMultiplier);
 
 	addOperation("send_reset_program", &URDriver_program::send_reset_program, this, RTT::OwnThread);
 	addOperation("send_program", &URDriver_program::send_program, this, RTT::OwnThread);
@@ -173,6 +180,7 @@ bool URDriver_program::open_server()
 	newsockfd = accept(listenfd,
 			   (struct sockaddr *) &cli_addr,
 			   &clilen);
+
 	cout<<"after accept"<<endl;
 	if (newsockfd < 0)
 	{
@@ -219,14 +227,14 @@ void URDriver_program::updateHook(){
 		}*/
 
 		int data_frame[9];
-		double time=getPeriod()*1;//make the function on robot side returns before he get new data
-		time_now+=getPeriod();
-		qdes[4]=sin(time_now*3.14*freq)*velocity_apl;
+		double period=getPeriod();//make the function on robot side returns before he get new data
+		time_now+=period;
+		qdes[5]=sin(time_now*3.14*freq)*velocity_apl;
 		data_frame[0]=MSG_VELJ;
 		for (int i=0;i<6;i++)
 			data_frame[1+i]=(int)(qdes[i]*MULT_jointstate);
 		data_frame[7]=(int)(acc_limit*MULT_jointstate);//max acc
-		data_frame[8]=(int)(time*MULT_time);//time
+		data_frame[8]=(int)(period*MULT_time*timeStepMultiplier);//time
 		if (!send_out(data_frame,9))
 		{
 			Logger::In in(this->getName());
@@ -266,7 +274,7 @@ void URDriver_program::updateHook(){
 			cout<<"MSG_WAYPOINT_FINISHED"<<endl;
 			int way_point;
 			n = read(newsockfd, &way_point, sizeof(way_point));
-			cout<<"way_point: "<<way_point<<endl;
+			//cout<<"way_point: "<<way_point<<endl;
 			break;
 		case MSG_OUT:
 			//cout<<"MSG_OUT"<<endl;
@@ -349,14 +357,31 @@ void URDriver_program::cleanupHook() {
 }
 bool  URDriver_program::send_program(){
 	//if (!ready_to_send_program) return false;
-	std::ifstream t("prog.ur");
+	std::ifstream t(program_file.c_str());
 	std::stringstream buffer;
 	buffer << t.rdbuf();
 	string program=buffer.str();
+const string HostName="$HOSTNAME$";
+const string PortNumber="$PortNumber$";
+	if(!replaceSubString(program,HostName,my_adress))
+	{
+		Logger::In in(this->getName());
+		log(Error)<<this->getName()<<": cannot find string "<<HostName<<" in file "<<
+				 program_file << endlog();
 
-	//cout<<program<<endl;
+		return false;
+	}
+	if(!replaceSubString(program,PortNumber,std::to_string(reverse_port_number)))
+	{
+		Logger::In in(this->getName());
+		log(Error)<<this->getName()<<": cannot find string "<<PortNumber<<" in file "<<
+				 program_file << endlog();
 
-	int bytes=send(sockfd,program.c_str(),program.length(),0);
+		return false;
+	}
+
+
+	unsigned int bytes=send(sockfd,program.c_str(),program.length(),0);
 	if (bytes==program.length())
 		return true;
 	else return false;
@@ -367,7 +392,7 @@ bool  URDriver_program::send_reset_program(){
 			"def resetProg():\n"//"popup(\"reset\")\n"
 			"sleep(0.1)\n"
 			"end\n";
-	int bytes=send(sockfd,reset_program.c_str(),reset_program.length(),0);
+	unsigned int bytes=send(sockfd,reset_program.c_str(),reset_program.length(),0);
 	if (bytes==reset_program.length())
 		return true;
 	else return false;

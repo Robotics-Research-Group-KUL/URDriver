@@ -11,6 +11,7 @@ cmake_minimum_required(VERSION 2.6.3)
 # any cmake macro you see fit.
 #
 project(URDriver)
+add_definitions(-std=c++11)
 
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_RELEASE} -Wall")#this disable debug stuff
@@ -47,5 +48,7 @@ WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 COMMENT "Generating API documentation with Doxygen" VERBATIM
 )
 #endif(DOXYGEN_FOUND)
+
+catkin_add_gtest(utest test/utest.cpp)
 
 orocos_generate_package()

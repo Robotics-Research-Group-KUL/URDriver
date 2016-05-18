@@ -69,11 +69,55 @@ template <class T> int swap (T& d)
 	return n;
 }
 
-inline bool copyvector( const double vin [],std::vector<double>&vout, int size)
+inline bool copyvector( const double vin [],std::vector<double>&vout,unsigned int size)
 {
 	if (vout.size()!=size) return false;
-	for (int i=0;i<size;i++)
+	for (unsigned int i=0;i<size;i++)
 		vout[i]=vin[i];
+	return true;
+}
+
+
+
+
+inline int make_socket (uint16_t port)
+{
+	int sock;
+	struct sockaddr_in name;
+
+	/* Create the socket. */
+	sock = socket (PF_INET, SOCK_STREAM, 0);
+	if (sock < 0)
+	{
+		return -1;
+	}
+
+	/* Give the socket a name. */
+	name.sin_family = AF_INET;
+	name.sin_port = htons (port);
+	name.sin_addr.s_addr = htonl (INADDR_ANY);
+	if (bind (sock, (struct sockaddr *) &name, sizeof (name)) < 0)
+	{
+		return -2;
+	}
+
+	return sock;
+}
+
+
+/**
+ * @brief replaceSubString
+ * Replace the first occurence "from" to "to" in the string "str"
+ * @param str string to be modified
+ * @param from substring to be changed
+ * @param to substring to inserted in place
+ * @return false if from is not found
+ */
+bool replaceSubString(std::string& str, const std::string& from, const std::string& to) {
+	size_t start_pos = str.find(from);
+	if(start_pos == std::string::npos)
+		return false;
+	str.replace(start_pos, from.length(), to);
 	return true;
 }
 #endif

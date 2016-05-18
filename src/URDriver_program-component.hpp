@@ -2,8 +2,8 @@
 #define OROCOS_URDriver_program_COMPONENT_HPP
 
 #include <rtt/RTT.hpp>
-#include "Deserialize.hpp"
-
+#include "URDriver/Deserialize.hpp"
+#include "URDriver/utils.hpp"
 
 #define MSG_OUT			1
 #define MSG_QUIT		2
@@ -55,10 +55,13 @@ private:
 	///@{
 	int port_number;
 	int reverse_port_number;
-	string prop_adress;
+	string prop_adress;//<Address of robot
+	string my_adress;//<Address of pc where component is runnung
+	string program_file;//<Address of pc where component
 	double velocity_apl;
 	double acc_limit;
 	double freq;
+		double timeStepMultiplier;
 	///@}
 	fd_set         sock;
 
@@ -87,27 +90,5 @@ double time_now;
 
 };
 
-inline int make_socket (uint16_t port)
-{
-	int sock;
-	struct sockaddr_in name;
 
-	/* Create the socket. */
-	sock = socket (PF_INET, SOCK_STREAM, 0);
-	if (sock < 0)
-	{
-		return -1;
-	}
-
-	/* Give the socket a name. */
-	name.sin_family = AF_INET;
-	name.sin_port = htons (port);
-	name.sin_addr.s_addr = htonl (INADDR_ANY);
-	if (bind (sock, (struct sockaddr *) &name, sizeof (name)) < 0)
-	{
-		return -2;
-	}
-
-	return sock;
-}
 #endif

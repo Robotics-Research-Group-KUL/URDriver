@@ -32,4 +32,4 @@ target_link_libraries(URDriverRT_dummy_server
 #
 # You may add multiple orocos_install_headers statements.
 
- add_executable(swap_test swap_test.cpp )
+ #add_executable(swap_test swap_test.cpp )

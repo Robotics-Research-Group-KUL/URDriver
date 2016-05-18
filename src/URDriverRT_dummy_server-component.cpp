@@ -2,10 +2,10 @@
 #include <rtt/Component.hpp>
 #include <iostream>
 #include <fstream>      // std::ifstream
-#include "utils.hpp"      // std::ifstream
+#include "URDriver/utils.hpp"
 #include <libexplain/bind.h>
 #include <signal.h>
-#include "Deserialize.hpp"
+#include "URDriver/Deserialize.hpp"
 using namespace RTT;
 URDriverRT_dummy_server::URDriverRT_dummy_server(std::string const& name) : TaskContext(name,PreOperational)
       , reverse_port_number(30003)

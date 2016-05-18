@@ -28,7 +28,7 @@ ros = gs:provides("ros")
 
 ros:import("URDriver")
 
-rtt.setLogLevel("Info")
+--rtt.setLogLevel("Info")
 
 depl:loadComponent("URDriverRT_receiver", "URDriverRT_receiver")
 URDriverRT_receiver=depl:getPeer("URDriverRT_receiver")
@@ -42,15 +42,19 @@ URDriver_program=depl:getPeer("URDriver_program")
 --URDriver_receiver:setPeriod(0.1)
 
 URDriver_program:setPeriod(0.004)
+URDriver_program:getProperty("prop_adress"):set("127.0.0.1")
 
+URDriverRT_receiver:getProperty("prop_adress"):set("127.0.0.1")
 if not URDriverRT_receiver:configure() then
   print("failed to conf URDriverRT_receiver")
 end
 
+
+--[[
 if not URDriver_receiver:configure() then
   print("failed to conf URDriver_receiver")
 end
---[[
+]]--
 if not URDriverRT_receiver:start()then
   print("failed to start")
 end
@@ -58,17 +62,18 @@ end
 if not URDriver_program:configure() then
   print("failed to conf URDriver_program")
 end
-
+  print(">> send-program")
 if not URDriver_program:send_program()then
   print("failed to send-program")
 end
+  print(">> open-server")
 if not URDriver_program:open_server()then
-  print("failed to send-program")
+  print("failed to open-server")
 end
 if not URDriver_program:start()then
   print("failed to start URDriver_program")
 end
-
+--[[
 cd URDriver_program
 var array q(6)
 q[1]=-1.57
