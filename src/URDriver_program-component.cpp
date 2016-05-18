@@ -40,7 +40,7 @@ URDriver_program::URDriver_program(std::string const& name) : TaskContext(name,P
 		     &URDriver_program::stop_send_velocity, this, RTT::OwnThread);
 
 
-	addEventPort("qdes_inport",qdes_inport);
+	addPort("qdes_inport",qdes_inport);
 
 	/* */
 
@@ -112,6 +112,7 @@ bool URDriver_program::configureHook(){
 	Logger::In in(this->getName());
 	if( connect(sockfd, (struct sockaddr *)&robot_addr, sizeof(robot_addr)) < 0)
 	{
+		Logger::In in(this->getName());
 		log(Error)<<this->getName()<<": Connection failed!"<< endlog();
 		return false;
 	}
@@ -123,7 +124,7 @@ bool URDriver_program::configureHook(){
 
 	listenfd = socket(AF_INET, SOCK_STREAM, 0);
 	int yes=1;
-	//char yes='1'; // use this under Solaris
+
 
 
 	//TODO take these lines out...
@@ -201,7 +202,8 @@ bool URDriver_program::startHook(){
 
 
 	time_now=0;
-	qdes[4]=0;
+	std::fill(qdes.begin(), qdes.end(), 0.0);
+
 	return true;
 	//return server_ok;
 }
@@ -216,20 +218,24 @@ void URDriver_program::updateHook(){
 	if(sending_velocity)
 	{
 
-		/*if(qdes_inport.read(qdes)!=NoData)
-		{
-			if (qdes.size()!=6)
+		if(qdes_inport.read(qdes)!=NoData){
+			if (qdes.size()!=6){
 				Logger::In in(this->getName());
-			log(Error)<<this->getName()<<": error size of q in port "<<qdes_inport.getName()<<".\n STOPPING."<< endlog();
-			this->stop();
-
-
-		}*/
+				log(Error)<<this->getName()<<": error size of q in port "<<qdes_inport.getName()<<".\n STOPPING."<< endlog();
+				this->stop();
+			}
+		}
+		else{
+			/*Logger::In in(this->getName());
+			log(Error)<<this->getName()<<": no data in port "<<qdes_inport.getName()<<".\n STOPPING."<< endlog();
+			this->stop();*/
+			std::fill(qdes.begin(), qdes.end(), 0.0);
+		}
 
 		int data_frame[9];
 		double period=getPeriod();//make the function on robot side returns before he get new data
 		time_now+=period;
-		qdes[5]=sin(time_now*3.14*freq)*velocity_apl;
+		//qdes[5]=sin(time_now*3.14*freq)*velocity_apl;//TODO take this out
 		data_frame[0]=MSG_VELJ;
 		for (int i=0;i<6;i++)
 			data_frame[1+i]=(int)(qdes[i]*MULT_jointstate);

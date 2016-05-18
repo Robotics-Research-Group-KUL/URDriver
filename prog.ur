@@ -25,7 +25,7 @@ def driverProg():
   
   MSG_VELJ=20
 
-  popup("NEW PROGRAM")
+  #popup("NEW PROGRAM")
   
 
 

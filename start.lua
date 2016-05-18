@@ -62,6 +62,7 @@ end
 if not URDriver_program:configure() then
   print("failed to conf URDriver_program")
 end
+
   print(">> send-program")
 if not URDriver_program:send_program()then
   print("failed to send-program")
