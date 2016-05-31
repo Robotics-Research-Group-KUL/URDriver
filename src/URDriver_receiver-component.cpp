@@ -8,7 +8,7 @@ URDriver_receiver::URDriver_receiver(std::string const& name) : TaskContext(name
 , port_number(30002)
 {
 	addProperty("port_number",port_number);
-	addProperty("prop_adress",prop_adress);
+	addProperty("robot_adress",prop_adress);
 
 	/// robot_mode_value
 	this->provides("robot_mode_value")->doc("Ports giving access to the state of the robot.");

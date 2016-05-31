@@ -8,7 +8,7 @@ URDriverRT_receiver::URDriverRT_receiver(std::string const& name) : TaskContext(
 , port_number(30003)
 {
 	addProperty("port_number",port_number);
-	addProperty("prop_adress",prop_adress);
+	addProperty("robot_adress",prop_adress);
 	addPort("q_actual_outport",q_actual_outport);
 	addPort("qd_actual_outport",qd_actual_outport);
 	addPort("time_outport",time_outport);

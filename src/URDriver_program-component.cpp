@@ -20,7 +20,7 @@ URDriver_program::URDriver_program(std::string const& name) : TaskContext(name,P
 {
 	addProperty("port_number",port_number);
 	addProperty("reverse_port_number",reverse_port_number);
-	addProperty("prop_adress",prop_adress).doc("ip address robot.");
+	addProperty("robot_adress",prop_adress).doc("ip address robot.");
 	addProperty("my_adress",my_adress).doc("ip address this pc.");
 	addProperty("program_file",program_file).doc("file containing the program to be send to the robot.");
 	addProperty("timeOut",timeOut).doc("Used in commanding velocity; time [s] after that the command returns");
