@@ -23,8 +23,11 @@ find_package(OROCOS-RTT QUIET)
 if (NOT OROCOS-RTT_FOUND)
   message (FATAL_ERROR "\nCould not find Orocos. Please use the shell command\n 'source orocos_toolchain/env.sh' and then run cmake again.")
 endif()
-
+find_package(catkin REQUIRED)
+find_package(rostest REQUIRED)
 find_package(PkgConfig REQUIRED)
+
+
 pkg_check_modules(LEXP REQUIRED libexplain)
 include_directories(include ${LEXP_INCLUDE_DIRS})
 # Defines the orocos_* cmake macros. See that file for additional
@@ -34,10 +37,10 @@ include( ${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake )
 # Rest of the configuration is in src/
 add_subdirectory( src )
 
-#
-# Generates and installs our package. Must be the last statement such
-# that it can pick up all above settings.
-#
+
+
+
+
 # add a target to generate API documentation with Doxygen
 find_package(Doxygen)
 #if(DOXYGEN_FOUND)
@@ -49,6 +52,7 @@ COMMENT "Generating API documentation with Doxygen" VERBATIM
 )
 #endif(DOXYGEN_FOUND)
 
-catkin_add_gtest(utest test/utest.cpp)
-
 orocos_generate_package()
+
+
+catkin_add_gtest(utest test/utest.cpp)

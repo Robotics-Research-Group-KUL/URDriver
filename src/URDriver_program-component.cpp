@@ -8,36 +8,34 @@
 #include <string>     // std::string, std::to_string
 using namespace RTT;
 URDriver_program::URDriver_program(std::string const& name) : TaskContext(name,PreOperational)
-      , prop_adress("192.168.1.102")
-      , port_number(30002)
-      , ready_to_send_program(false)
-      , reverse_port_number(50001)
-      , qdes(6,0.0)
-	  , velocity_apl(0.1)
-	  , acc_limit(100000.0)
-	  , freq(1.0)
-	  , timeStepMultiplier(3.0)
-	  , my_adress("127.0.0.1")
-	  , program_file("prog.ur")
+  , prop_adress("192.168.1.102")
+  , port_number(30002)
+  , ready_to_send_program(false)
+  , reverse_port_number(50001)
+  , qdes(6,0.0)
+  , acc_limit(100000.0)
+  , timeOut(0.08)
+  , my_adress("127.0.0.1")
+  , program_file("prog.ur")
 {
 	addProperty("port_number",port_number);
 	addProperty("reverse_port_number",reverse_port_number);
 	addProperty("prop_adress",prop_adress).doc("ip address robot.");
 	addProperty("my_adress",my_adress).doc("ip address this pc.");
 	addProperty("program_file",program_file).doc("file containing the program to be send to the robot.");
-	addProperty("timeStepMultiplier",timeStepMultiplier);
+	addProperty("timeOut",timeOut).doc("Used in commanding velocity; time [s] after that the command returns");
 
 	addOperation("send_reset_program", &URDriver_program::send_reset_program, this, RTT::OwnThread);
 	addOperation("send_program", &URDriver_program::send_program, this, RTT::OwnThread);
 	addOperation("send_joint_objective",
-		     &URDriver_program::send_joint_objective, this, RTT::OwnThread);
+				 &URDriver_program::send_joint_objective, this, RTT::OwnThread);
 	addOperation("open_server",
-		     &URDriver_program::open_server, this, RTT::OwnThread);
+				 &URDriver_program::open_server, this, RTT::OwnThread);
 
 	addOperation("start_send_velocity",
-		     &URDriver_program::start_send_velocity, this, RTT::OwnThread);
+				 &URDriver_program::start_send_velocity, this, RTT::OwnThread);
 	addOperation("stop_send_velocity",
-		     &URDriver_program::stop_send_velocity, this, RTT::OwnThread);
+				 &URDriver_program::stop_send_velocity, this, RTT::OwnThread);
 
 
 	addPort("qdes_inport",qdes_inport);
@@ -46,9 +44,8 @@ URDriver_program::URDriver_program(std::string const& name) : TaskContext(name,P
 
 
 	//test stuff
-	addProperty("velocity_apl",velocity_apl);
+
 	addProperty("acc_limit",acc_limit);
-	addProperty("freq",freq);
 
 
 	buffer.reserve(1024);
@@ -103,8 +100,8 @@ bool URDriver_program::configureHook(){
 	{
 		Logger::In in(this->getName());
 		log(Error)<<this->getName()<<":the string "<<prop_adress
-			 <<" is not a good formatted string for address ( like 127.0.0.1)"
-			<< endlog();
+				 <<" is not a good formatted string for address ( like 127.0.0.1)"
+				<< endlog();
 		return false;
 	}
 
@@ -152,11 +149,11 @@ bool URDriver_program::configureHook(){
 		Logger::In in(this->getName());
 		char message[3000];
 		explain_message_bind(message, sizeof(message),
-				     listenfd, (struct sockaddr*)&program_server_addr, sizeof(program_server_addr));
+							 listenfd, (struct sockaddr*)&program_server_addr, sizeof(program_server_addr));
 		log(Error)<<this->getName()<<": error binding socket server.\n"
-			 <<"bind ret: "<<bind_ret<<
-			   "\nerrno: "<<errno<<
-			   "\nMessage:"<<message<<endlog();
+				 <<"bind ret: "<<bind_ret<<
+				   "\nerrno: "<<errno<<
+				   "\nMessage:"<<message<<endlog();
 
 		return false;
 	}
@@ -172,22 +169,22 @@ bool URDriver_program::open_server()
 	{
 		Logger::In in(this->getName());
 		log(Error)<<this->getName()<<": error listening socket server.\n"
-			 <<"listen_ret "<<listen_ret<< endlog();
+				 <<"listen_ret "<<listen_ret<< endlog();
 
 		return false;
 	}
 	cout<<"after listen"<<endl;
 	socklen_t  clilen = sizeof(cli_addr);
 	newsockfd = accept(listenfd,
-			   (struct sockaddr *) &cli_addr,
-			   &clilen);
+					   (struct sockaddr *) &cli_addr,
+					   &clilen);
 
 	cout<<"after accept"<<endl;
 	if (newsockfd < 0)
 	{
 		Logger::In in(this->getName());
 		log(Error)<<this->getName()<<": error accepting connection.\n"
-			 <<"listen_ret "<<listen_ret<< endlog();
+				 <<"listen_ret "<<listen_ret<< endlog();
 
 		return false;
 	}
@@ -240,7 +237,7 @@ void URDriver_program::updateHook(){
 		for (int i=0;i<6;i++)
 			data_frame[1+i]=(int)(qdes[i]*MULT_jointstate);
 		data_frame[7]=(int)(acc_limit*MULT_jointstate);//max acc
-		data_frame[8]=(int)(period*MULT_time*timeStepMultiplier);//time
+		data_frame[8]=(int)(timeOut*MULT_time);//time
 		if (!send_out(data_frame,9))
 		{
 			Logger::In in(this->getName());
@@ -270,7 +267,7 @@ void URDriver_program::updateHook(){
 		swap(msg_type);
 		if  (n <= 0)
 		{
-		/*	Logger::In in(this->getName());
+			/*	Logger::In in(this->getName());
 			log(Error)<<this->getName()<<": error in read, stopping."<< endlog();
 			this->stop();*/
 			return;
@@ -367,13 +364,13 @@ bool  URDriver_program::send_program(){
 	std::stringstream buffer;
 	buffer << t.rdbuf();
 	string program=buffer.str();
-const string HostName="$HOSTNAME$";
-const string PortNumber="$PortNumber$";
+	const string HostName="$HOSTNAME$";
+	const string PortNumber="$PortNumber$";
 	if(!replaceSubString(program,HostName,my_adress))
 	{
 		Logger::In in(this->getName());
 		log(Error)<<this->getName()<<": cannot find string "<<HostName<<" in file "<<
-				 program_file << endlog();
+					program_file << endlog();
 
 		return false;
 	}
@@ -381,7 +378,7 @@ const string PortNumber="$PortNumber$";
 	{
 		Logger::In in(this->getName());
 		log(Error)<<this->getName()<<": cannot find string "<<PortNumber<<" in file "<<
-				 program_file << endlog();
+					program_file << endlog();
 
 		return false;
 	}

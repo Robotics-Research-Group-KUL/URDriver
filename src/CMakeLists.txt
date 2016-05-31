@@ -15,11 +15,10 @@
 orocos_component( URDriverRT_receiver URDriverRT_receiver-component.cpp) # ...you may add multiple source files
 orocos_component( URDriver_receiver URDriver_receiver-component.cpp) # ...you may add multiple source files
 orocos_component( URDriver_program URDriver_program-component.cpp) # ...you may add multiple source files
-orocos_component( URDriverRT_dummy_server URDriverRT_dummy_server-component.cpp)
+
 target_link_libraries(URDriver_program
                       ${LEXP_LIBRARIES})
-target_link_libraries(URDriverRT_dummy_server
-                      ${LEXP_LIBRARIES})
+
 #
 # You may add multiple orocos_component statements.
 

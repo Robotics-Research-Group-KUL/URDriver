@@ -41,7 +41,7 @@ URDriver_program=depl:getPeer("URDriver_program")
 
 --URDriver_receiver:setPeriod(0.1)
 
-URDriver_program:setPeriod(0.004)
+URDriver_program:setPeriod(0.008)
 URDriver_program:getProperty("prop_adress"):set("127.0.0.1")
 
 URDriverRT_receiver:getProperty("prop_adress"):set("127.0.0.1")

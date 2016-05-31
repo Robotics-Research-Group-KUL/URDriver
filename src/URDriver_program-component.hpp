@@ -58,11 +58,8 @@ private:
 	string prop_adress;//<Address of robot
 	string my_adress;//<Address of pc where component is runnung
 	string program_file;//<Address of pc where component
-
-	double velocity_apl;//TODO take this out
 	double acc_limit;
-	double freq;//TODO take this out
-	double timeStepMultiplier;
+	double timeOut;
 	///@}
 	fd_set         sock;
 
