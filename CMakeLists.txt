@@ -55,4 +55,4 @@ COMMENT "Generating API documentation with Doxygen" VERBATIM
 orocos_generate_package()
 
 
-catkin_add_gtest(utest test/utest.cpp)
+#catkin_add_gtest(swapTestInt_utest test/swapTestInt_utest.cpp)

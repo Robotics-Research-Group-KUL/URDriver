@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <vector>
+#include <string>
 
 #ifndef _UTILS_HPP_
 #define _UTILS_HPP_
