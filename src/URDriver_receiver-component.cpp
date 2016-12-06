@@ -4,11 +4,11 @@
 using namespace RTT;
 URDriver_receiver::URDriver_receiver(std::string const& name) : TaskContext(name,PreOperational)
 , v6(6,0.0)
-, prop_adress("192.168.1.102")
+, prop_address("192.168.1.102")
 , port_number(30002)
 {
 	addProperty("port_number",port_number);
-	addProperty("robot_adress",prop_adress);
+    addProperty("robot_address",prop_address);
 
 	/// robot_mode_value
 	this->provides("robot_mode_value")->doc("Ports giving access to the state of the robot.");
@@ -42,10 +42,10 @@ bool URDriver_receiver::configureHook(){
 	serv_addr.sin_port=htons(port_number);
 
 	//Convert from presentation format to an Internet number
-	if(inet_pton(AF_INET, prop_adress.c_str(), &serv_addr.sin_addr)<=0)
+    if(inet_pton(AF_INET, prop_address.c_str(), &serv_addr.sin_addr)<=0)
 	{
 		Logger::In in(this->getName());
-		log(Error)<<this->getName()<<":the string "<<prop_adress
+        log(Error)<<this->getName()<<":the string "<<prop_address
 				<<" is not a good formatted string for address ( like 127.0.0.1)"
 				<< endlog();
 		///add log from other file

@@ -21,7 +21,7 @@ class URDriverRT_receiver : public RTT::TaskContext{
     //!@name Properties
     ///@{
     int port_number;
-    string prop_adress;
+    string prop_address;
     ///@}
 
 	RTT::extras::FileDescriptorActivity* act;

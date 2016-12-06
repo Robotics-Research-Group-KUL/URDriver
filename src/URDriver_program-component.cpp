@@ -8,20 +8,20 @@
 #include <string>     // std::string, std::to_string
 using namespace RTT;
 URDriver_program::URDriver_program(std::string const& name) : TaskContext(name,PreOperational)
-  , prop_adress("192.168.1.102")
+  , prop_address("192.168.1.102")
   , port_number(30002)
   , ready_to_send_program(false)
   , reverse_port_number(50001)
   , qdes(6,0.0)
   , acc_limit(100000.0)
   , timeOut(0.08)
-  , my_adress("127.0.0.1")
+  , my_address("127.0.0.1")
   , program_file("prog.ur")
 {
 	addProperty("port_number",port_number);
 	addProperty("reverse_port_number",reverse_port_number);
-	addProperty("robot_adress",prop_adress).doc("ip address robot.");
-	addProperty("my_adress",my_adress).doc("ip address this pc.");
+    addProperty("robot_address",prop_address).doc("ip address robot.");
+    addProperty("my_address",my_address).doc("ip address this pc.");
 	addProperty("program_file",program_file).doc("file containing the program to be send to the robot.");
 	addProperty("timeOut",timeOut).doc("Used in commanding velocity; time [s] after that the command returns");
 
@@ -96,10 +96,10 @@ bool URDriver_program::configureHook(){
 	robot_addr.sin_family = AF_INET;
 	robot_addr.sin_port=htons(port_number);
 	//Convert from presentation format to an Internet number
-	if(inet_pton(AF_INET, prop_adress.c_str(), &robot_addr.sin_addr)<=0)
+    if(inet_pton(AF_INET, prop_address.c_str(), &robot_addr.sin_addr)<=0)
 	{
 		Logger::In in(this->getName());
-		log(Error)<<this->getName()<<":the string "<<prop_adress
+        log(Error)<<this->getName()<<":the string "<<prop_address
 				 <<" is not a good formatted string for address ( like 127.0.0.1)"
 				<< endlog();
 		return false;
@@ -366,7 +366,7 @@ bool  URDriver_program::send_program(){
 	string program=buffer.str();
 	const string HostName="$HOSTNAME$";
 	const string PortNumber="$PortNumber$";
-	if(!replaceSubString(program,HostName,my_adress))
+    if(!replaceSubString(program,HostName,my_address))
 	{
 		Logger::In in(this->getName());
 		log(Error)<<this->getName()<<": cannot find string "<<HostName<<" in file "<<
