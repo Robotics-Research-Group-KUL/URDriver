@@ -37,6 +37,15 @@ include( ${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake )
 # Rest of the configuration is in src/
 add_subdirectory( src )
 
+file(GLOB_RECURSE EXTRA_FILES
+    package.xml
+    *.ops
+    *.lua
+    cpf/*
+    include/URDriver/*)
+add_custom_target(${PROJECT_NAME}_OTHER_FILES ALL WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} SOURCES ${EXTRA_FILES})
+
+
 
 
 
