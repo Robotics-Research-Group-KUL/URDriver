@@ -42,9 +42,21 @@ URDriver_program=depl:getPeer("URDriver_program")
 --URDriver_receiver:setPeriod(0.1)
 
 URDriver_program:setPeriod(0.008)
+
+--[[
+--for real robot
 URDriver_program:getProperty("robot_adress"):set("192.168.1.102")
 URDriver_program:getProperty("my_adress"):set("192.168.1.101")
 URDriverRT_receiver:getProperty("robot_adress"):set("192.168.1.102")
+]]--
+
+-- for ur sim on the same robot
+URDriver_program:getProperty("robot_adress"):set("127.0.0.1")
+URDriver_program:getProperty("my_adress"):set("127.0.0.1")
+URDriverRT_receiver:getProperty("robot_adress"):set("127.0.0.1")
+
+
+
 if not URDriverRT_receiver:configure() then
   print("failed to conf URDriverRT_receiver")
 end
