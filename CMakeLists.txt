@@ -18,8 +18,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_RELEASE} -Wall")#this disable debug stuff
 #set( CMAKE_VERBOSE_MAKEFILE on )
 
 
-file(GLOB_RECURSE EXTRA_FILES *.ops *.lua *.py cpf/* )
-add_custom_target(${PROJECT_NAME}_OTHER_FILES ALL WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} SOURCES ${EXTRA_FILES})
+
 
 # Use 'source orocos_toolchain/env.sh' if the command below fails:
 find_package(OROCOS-RTT QUIET)

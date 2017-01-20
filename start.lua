@@ -51,9 +51,9 @@ URDriverRT_receiver:getProperty("robot_adress"):set("192.168.1.102")
 ]]--
 
 -- for ur sim on the same robot
-URDriver_program:getProperty("robot_adress"):set("127.0.0.1")
-URDriver_program:getProperty("my_adress"):set("127.0.0.1")
-URDriverRT_receiver:getProperty("robot_adress"):set("127.0.0.1")
+URDriver_program:getProperty("robot_address"):set("127.0.0.1")
+URDriver_program:getProperty("my_address"):set("127.0.0.1")
+URDriverRT_receiver:getProperty("robot_address"):set("127.0.0.1")
 
 
 
