@@ -55,8 +55,8 @@ private:
 	///@{
 	int port_number;
 	int reverse_port_number;
-	string prop_adress;//<Address of robot
-	string my_adress;//<Address of pc where component is runnung
+    string prop_address;//<Address of robot
+    string my_address;//<Address of pc where component is runnung
 	string program_file;//<Address of pc where component
 	double acc_limit;
 	double timeOut;
