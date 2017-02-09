@@ -163,7 +163,7 @@ public:
 	}
 
 	RTdata::Ptr data_pointer;
-	bool setConnection(int port_number,string prop_adress)
+	bool setConnection(int port_number,string prop_address)
 	{
 		sockfd = socket(AF_INET, SOCK_STREAM, 0);
 		if (sockfd < 0)
@@ -173,14 +173,14 @@ public:
 		serv_addr.sin_port=htons(port_number);
 
 		//Convert from presentation format of an Internet number
-		if(inet_pton(AF_INET, prop_adress.c_str(), &serv_addr.sin_addr)<=0)
+		if(inet_pton(AF_INET, prop_address.c_str(), &serv_addr.sin_addr)<=0)
 		{
 
 			return false;
 		}
 		return true;
 	};
-	bool startConnection(int port_number,string prop_adress){
+	bool startConnection(int port_number,string prop_address){
 		if( connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
 			return false;
 		return true;
