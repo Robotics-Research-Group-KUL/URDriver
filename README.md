@@ -15,9 +15,9 @@ set the pc address in the same subnet of the robot and set such IPs in propertie
     URDriver_program=depl:getPeer("URDriver_program")
     
     URDriver_program:setPeriod(timefreq)			 
-    URDriver_program:getProperty("robot_adress"):set("192.168.1.102")--ip robot
-    URDriver_program:getProperty("my_adress"):set("192.168.1.101")
-    URDriverRT_receiver:getProperty("robot_adress"):set("192.168.1.102")
+    URDriver_program:getProperty("robot_address"):set("192.168.1.102")--ip robot
+    URDriver_program:getProperty("my_address"):set("192.168.1.101")
+    URDriverRT_receiver:getProperty("robot_address"):set("192.168.1.102")
     URDriver_program:getProperty("timeOut"):set(timefreq)
 ```
      
