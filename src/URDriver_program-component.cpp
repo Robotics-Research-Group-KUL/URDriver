@@ -8,15 +8,15 @@
 #include <string>     // std::string, std::to_string
 using namespace RTT;
 URDriver_program::URDriver_program(std::string const& name) : TaskContext(name,PreOperational)
-  , prop_address("192.168.1.102")
   , port_number(30002)
-  , ready_to_send_program(false)
   , reverse_port_number(50001)
-  , qdes(6,0.0)
-  , acc_limit(100000.0)
-  , timeOut(0.08)
+  , prop_address("192.168.1.102")
   , my_address("127.0.0.1")
   , program_file("prog.ur")
+  , acc_limit(100000.0)
+  , timeOut(0.08)
+  , ready_to_send_program(false)
+  , qdes(6,0.0)
 {
 	addProperty("port_number",port_number);
 	addProperty("reverse_port_number",reverse_port_number);
@@ -105,7 +105,7 @@ bool URDriver_program::configureHook(){
 		return false;
 	}
 
-	cout<<"connect to robot port"<<endl;
+	log(Info) << this->getName() << ": connecting to robot ..." << endlog();
 	Logger::In in(this->getName());
 	if( connect(sockfd, (struct sockaddr *)&robot_addr, sizeof(robot_addr)) < 0)
 	{
@@ -126,11 +126,11 @@ bool URDriver_program::configureHook(){
 
 	//TODO take these lines out...
 	if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1) {
-		cout<<"error setsockopt"<<endl;
+		log(Error) << this->getName() << ": comm error <setsockopt>" << endlog();
 		return false;
 	}
 	if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEPORT, &yes, sizeof(yes)) == -1) {
-		cout<<"error setsockopt 2"<<endl;
+		log(Error) << this->getName() << ": comm error <setsockopt 2>"<< endlog();
 		return false;
 	}
 
@@ -173,13 +173,13 @@ bool URDriver_program::open_server()
 
 		return false;
 	}
-	cout<<"after listen"<<endl;
+	log(Debug) << "after listen" << endlog();
 	socklen_t  clilen = sizeof(cli_addr);
 	newsockfd = accept(listenfd,
 					   (struct sockaddr *) &cli_addr,
 					   &clilen);
 
-	cout<<"after accept"<<endl;
+	log(Debug) << "after accept" << endlog();
 	if (newsockfd < 0)
 	{
 		Logger::In in(this->getName());
@@ -274,7 +274,7 @@ void URDriver_program::updateHook(){
 		}
 		switch(msg_type){
 		case MSG_WAYPOINT_FINISHED:
-			cout<<"MSG_WAYPOINT_FINISHED"<<endl;
+// 			cout<<"MSG_WAYPOINT_FINISHED"<<endl;
 			int way_point;
 			n = read(newsockfd, &way_point, sizeof(way_point));
 			//cout<<"way_point: "<<way_point<<endl;
@@ -294,10 +294,10 @@ void URDriver_program::updateHook(){
 
 			break;
 		case MSG_QUIT:
-			cout<<"MSG_QUIT"<<endl;
+// 			cout<<"MSG_QUIT"<<endl;
 			break;
 		default:
-			cout<<"ERROR IN MSG_TYPE"<<endl;
+			log(Error) << this->getName() << ": ERROR IN MSG_TYPE " << endlog();
 		}
 	}
 
