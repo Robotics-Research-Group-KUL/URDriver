@@ -103,3 +103,14 @@ qport = rttlib.port_clone_conn(URDriverRT_receiver:getPort("q_actual_outport"))
  q:fromtab({0,-1.57,0,1.57,-1.57,0})
  URDriver_program:send_joint_objective(q,10)
 ]]--
+
+
+--[[test velocity
+
+ URDriver_program:start_send_velocity()
+ qdd=rtt.Variable("array")
+
+ qqdport = rttlib.port_clone_conn(URDriver_program:getPort("qdes_inport"))
+qdd:fromtab({0.01,0.01,0.01,0.01,0.01,0.01})
+ qqdport:write(qdd)
+]]
