@@ -12,9 +12,12 @@
 #
 
 
-orocos_component( URDriverRT_receiver URDriverRT_receiver-component.cpp) # ...you may add multiple source files
-orocos_component( URDriver_receiver URDriver_receiver-component.cpp) # ...you may add multiple source files
-orocos_component( URDriver_program URDriver_program-component.cpp) # ...you may add multiple source files
+orocos_component( URDriverRT_receiver URDriverRT_receiver-component.cpp) #
+orocos_component( URDriver_program URDriver_program-component.cpp) #
+
+# this component is largery unfinished
+#orocos_component( URDriver_receiver URDriver_receiver-component.cpp) #
+
 
 target_link_libraries(URDriver_program
                       ${LEXP_LIBRARIES})
