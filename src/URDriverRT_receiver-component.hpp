@@ -19,15 +19,16 @@ class URDriverRT_receiver : public RTT::TaskContext{
   private:
 
     //!@name Properties
-    ///@{
+	///@{
+	string prop_address;
     int port_number;
-    string prop_address;
+	string version_interface;
     ///@}
 
 	RTT::extras::FileDescriptorActivity* act;
 	int sockfd;
-	RTT::os::TimeService::ticks                     m_time_begin;
-	RTT::os::TimeService::Seconds                   m_time_passed;
+	RTT::os::TimeService::ticks     m_time_begin;
+	RTT::os::TimeService::Seconds	m_time_passed;
 
 	struct sockaddr_in serv_addr;
 	struct hostent *server;

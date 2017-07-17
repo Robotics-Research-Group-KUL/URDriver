@@ -3,17 +3,19 @@
 #include <iostream>
 using namespace RTT;
 URDriverRT_receiver::URDriverRT_receiver(std::string const& name) : TaskContext(name,PreOperational)
-, v6(6,0.0)
 , prop_address("192.168.1.102")
 , port_number(30003)
+, version_interface("3.0-3.1")
+, v6(6,0.0)
 {
 	addProperty("port_number",port_number);
     addProperty("robot_address",prop_address);
+	addProperty("version_interface",version_interface);
 	addPort("q_actual_outport",q_actual_outport);
 	addPort("qd_actual_outport",qd_actual_outport);
 	addPort("time_outport",time_outport);
 	addPort("period_outport",period_outport);
-	data_pointer=RTdata::Ptr(new RTdataV31());
+
 	q_actual_outport.setDataSample(v6);
 
 
@@ -24,6 +26,20 @@ URDriverRT_receiver::URDriverRT_receiver(std::string const& name) : TaskContext(
 }
 
 bool URDriverRT_receiver::configureHook(){
+	if (version_interface== "3.0-3.1")
+		data_pointer=RTdata::Ptr(new RTdataV31());
+	else if (version_interface== "Pre-3.0")
+			data_pointer=RTdata::Ptr(new RTdataV18());
+	else{
+
+		Logger::In in(this->getName());
+		log(Error)<<this->getName()<<":version_interface given is "<<version_interface
+				<<" /n/t current accepted values are:"
+				  "/n/t \"3.0-3.1\""
+				  "/n/t \"Pre-3.0\""
+				<< endlog();
+		return false;
+	}
 
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
