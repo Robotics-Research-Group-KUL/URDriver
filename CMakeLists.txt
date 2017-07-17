@@ -41,6 +41,7 @@ add_subdirectory( src )
 
 file(GLOB_RECURSE EXTRA_FILES
     package.xml
+    README.md
     *.ops
     *.lua
     cpf/*

@@ -173,13 +173,13 @@ bool URDriver_program::open_server()
 
 		return false;
 	}
-	log(Debug) << "after listen" << endlog();
+	cout<<"after listen"<<endl;
 	socklen_t  clilen = sizeof(cli_addr);
 	newsockfd = accept(listenfd,
 					   (struct sockaddr *) &cli_addr,
 					   &clilen);
 
-	log(Debug) << "after accept" << endlog();
+	cout<<"after accept"<<endl;
 	if (newsockfd < 0)
 	{
 		Logger::In in(this->getName());
@@ -274,7 +274,7 @@ void URDriver_program::updateHook(){
 		}
 		switch(msg_type){
 		case MSG_WAYPOINT_FINISHED:
-// 			cout<<"MSG_WAYPOINT_FINISHED"<<endl;
+			cout<<"MSG_WAYPOINT_FINISHED"<<endl;
 			int way_point;
 			n = read(newsockfd, &way_point, sizeof(way_point));
 			//cout<<"way_point: "<<way_point<<endl;
@@ -294,10 +294,10 @@ void URDriver_program::updateHook(){
 
 			break;
 		case MSG_QUIT:
-// 			cout<<"MSG_QUIT"<<endl;
+			cout<<"MSG_QUIT"<<endl;
 			break;
 		default:
-			log(Error) << this->getName() << ": ERROR IN MSG_TYPE " << endlog();
+			cout<<"ERROR IN MSG_TYPE"<<endl;
 		}
 	}
 

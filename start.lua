@@ -43,17 +43,18 @@ URDriver_program=depl:getPeer("URDriver_program")
 
 URDriver_program:setPeriod(0.008)
 
+--[[
 --for real robot
 URDriver_program:getProperty("robot_address"):set("192.168.1.102")
 URDriver_program:getProperty("my_address"):set("192.168.1.101")
 URDriverRT_receiver:getProperty("robot_address"):set("192.168.1.102")
-
---[[
+]]--
 -- for ur sim on the same robot
 URDriver_program:getProperty("robot_address"):set("127.0.0.1")
 URDriver_program:getProperty("my_address"):set("127.0.0.1")
 URDriverRT_receiver:getProperty("robot_address"):set("127.0.0.1")
-]]--
+--for version 1.8
+URDriverRT_receiver:getProperty("version_interface"):set("Pre-3.0")
 
 
 if not URDriverRT_receiver:configure() then
@@ -86,10 +87,29 @@ if not URDriver_program:start()then
   print("failed to start URDriver_program")
 end
 --[[
+in ops
 cd URDriver_program
 var array q(6)
 q[1]=-1.57
 send_joint_objective (q,10)
 
 
+in lua
+
+qport = rttlib.port_clone_conn(URDriverRT_receiver:getPort("q_actual_outport"))
+=qport:read()
+ q=rtt.Variable("array")
+ q:fromtab({0,-1.57,0,1.57,-1.57,0})
+ URDriver_program:send_joint_objective(q,10)
 ]]--
+
+
+--[[test velocity
+
+ URDriver_program:start_send_velocity()
+ qdd=rtt.Variable("array")
+
+ qqdport = rttlib.port_clone_conn(URDriver_program:getPort("qdes_inport"))
+qdd:fromtab({0.01,0.01,0.01,0.01,0.01,0.01})
+ qqdport:write(qdd)
+]]
