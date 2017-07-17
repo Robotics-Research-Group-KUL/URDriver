@@ -57,7 +57,7 @@ private:
 	int reverse_port_number;
     string prop_address;//<Address of robot
     string my_address;//<Address of pc where component is runnung
-	string program_file;//<Address of pc where component
+	string program_file;//<Location of the file sent to the UR
 	double acc_limit;
 	double timeOut;
 	///@}
