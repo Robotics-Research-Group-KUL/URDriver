@@ -25,8 +25,8 @@ struct data_robot_mode_v31{ //packageType = ROBOT_MODE_DATA = 0
 	unsigned char controlMode;
 	double targetSpeedFraction;
 	double speedScaling;
-	double targetSpeedFractionLimit;  // ali
-	unsigned char reserved;       // ali
+	double targetSpeedFractionLimit;
+	unsigned char reserved;
 };
 #pragma pack(0)
 #pragma pack(1)
@@ -38,7 +38,7 @@ struct data_joint_single{ //packageType = ROBOT_MODE_DATA = 0
 	float V_actual;
 	float T_motor;
 	float T_micro;
-	uint8_t jointMode; //ali
+	uint8_t jointMode;
 };
 #pragma pack(0)
 #pragma pack(1)
