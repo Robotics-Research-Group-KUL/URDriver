@@ -82,15 +82,21 @@ There are 3 components:
 - **URDriverRT_receiver**: recieve the data every 8ms _it uses the file descriptor activity, so it does it should be aperiodic, as it is triggered when new data arrives_
 - **URDriver_receiver**: (component not compiled because largely not finished, not useful for control) recieve the data every 100ms _it also uses the file descriptor_.
 
-The data structures depends by the firmware (V3.0-3.1 and Pre-3.0 implemented), and affects the receivers, I think that the program should work for several versions (tested on 3.1 and 1.8).
+The data structures depends by the firmware (V5.4-5.9, V3.0-3.1 and Pre-3.0 implemented), and affects the receivers, I think that the program should work for several versions (tested on V5.9, 3.1 and 1.8).
 
-*Note*:  for V1.8, there is a property in the URDriverRT_receiver that must be set:
+*Note*:  for V3.0-3.1 and V1.8, there is a property in the URDriverRT_receiver that must be set depending on the version:
+
+```lua
+    URDriverRT_receiver:getProperty("version_interface"):set("3.0-3.1")
+```
+or
 ```lua
     URDriverRT_receiver:getProperty("version_interface"):set("Pre-3.0")
 ```
 
 The classes for reading the data from socket are all c++ (e.g.[RTDeserealize.hpp](include/URDriver/RTDeserialize.hpp) )
 
-There is a virtual class (e.g. ```RTdata```) that is implemented depending by the firmware (```RTdataV31``` or ```RTdataV18```).
+There is a virtual class (e.g. ```RTdata```) that is implemented depending by the firmware (```RTdataV59```, ```RTdataV31``` or ```RTdataV18```).
 There are several getter functions, that are implemented in the base class, they return ```-1``` if not reimplemented in the child class.
 The value is returned by reference.
+

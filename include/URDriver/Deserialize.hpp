@@ -77,6 +77,7 @@ public:
 			swap(data.joint[i].V_actual);
 			swap(data.joint[i].T_motor);
 			swap(data.joint[i].T_micro);
+			swap(data.joint[i].jointMode); //ali
 		}
 		return n;
 	}

@@ -106,6 +106,8 @@ def driverProg():
     cmd_Speed_a = a
     cmd_Speed_q = q
     cmd_Speed_dt = dt
+    # send_out("from prog")
+    textmsg("prog.ur set_Speed_setpoint")
     exit_critical
   end
   thread SpeedThread():
@@ -128,7 +130,17 @@ def driverProg():
       if state == Speed_RUNNING:
         #movej(qd)
         speedj(qd, a, dt)
-        #textmsg("qd ", qd[0])
+        #textmsg("qd printing:")
+        #textmsg("qd1: (from prog.ur)", qd[0])
+        #textmsg("qd2: (from prog.ur)", qd[1])
+        #textmsg("qd3: (from prog.ur)", qd[2])
+        #textmsg("qd4: (from prog.ur)", qd[3])
+        #textmsg("qd5: (from prog.ur)", qd[4])
+        #textmsg("qd6: (from prog.ur)", qd[5])
+        #textmsg("qd end printing")
+        #textmsg("a: (from prog.ur)", a)
+        #textmsg("t: (from prog.ur)", dt)
+        # send_out("from prog")
         #textmsg("a ", a)
         #textmsg("dt ", dt)
         #send_out("Servoed")
@@ -204,6 +216,8 @@ def driverProg():
         send_out("movej finished")
       elif mtype == MSG_VELJ:
         params_velj = socket_read_binary_integer(8)
+        textmsg("from MSG_VELJ")
+        # send_out("from prog")
         #  textmsg("Received" ,params_velj[1])
         if params_velj[0] != 8:
           textmsg("Received" ,params_velj[0])
