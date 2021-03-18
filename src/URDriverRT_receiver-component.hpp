@@ -5,6 +5,9 @@
 #include "URDriver/RTDeserialize.hpp"
 #include <rtt/extras/FileDescriptorActivity.hpp>
 #include <rtt/os/TimeService.hpp>
+
+// #include "URDriver_program-component.hpp"
+
 using namespace std;
 
 class URDriverRT_receiver : public RTT::TaskContext{
@@ -43,6 +46,8 @@ class URDriverRT_receiver : public RTT::TaskContext{
 	RTT::OutputPort<vector<double> > qd_actual_outport;
 	RTT::OutputPort<double > time_outport;
 	RTT::OutputPort<double > period_outport;
+
+	int size;
 	///@}
 
 };

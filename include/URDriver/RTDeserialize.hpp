@@ -59,6 +59,103 @@ public:
 };
 
 
+//!This class implements the protocol for controller form v5.4 and v5.9.
+/**
+ * details here
+ */
+class RTdataV59:public RTdata
+{
+public:
+	RTdataV59(){size=1116;type="5.4 to 5.9";}
+	int getNominalSize  ( int&t)const {t=sizeof(data);return 1;}
+	int getTime  ( double&t)const {t=data.Time;return 1;}
+	int getQ_actual  ( vector<double>&q)const
+	{if (copyvector(data.q_actual,q,6)) return 1; return 0;}
+	int getQdot_actual  ( vector<double>&qd)const
+	{if (copyvector(data.qd_actual,qd,6)) return 1; return 0;}
+
+
+	/**
+	 * Reads the data from the socket and fill in the internal data structure
+	 * @param sockfd socket identifier
+	 * @return number of bytes read
+	 */
+	int readRTData(const int sockfd)
+	{
+
+		int n = read(sockfd,&data,sizeof(data));
+
+		// std::cout << "sizeof(data):" <<std::endl;
+		// std::cout << sizeof(data) <<std::endl;
+
+		data.Message_Size=ntohl(data.Message_Size);
+		double * pointer=&data.Time;
+
+		for (int i=0;i<139;i++)
+		{
+
+			ntohd(pointer[i]);
+		}
+
+		return n;
+	};
+private:
+
+	//!This struct follows the indication of sheet 43 of the specfication given by UR.
+	/**For more info, look to
+	 * (../Client_InterfaceV3.14andV5.9.xlsx), page 43
+	 *
+	 */
+#pragma pack(1)
+	struct data_struct{
+		int Message_Size;
+		double Time;
+		double q_target[6],
+		qd_target	[6],
+		qdd_target	[6],
+		I_target	[6],
+		M_target	[6],
+		q_actual	[6],
+		qd_actual	[6],
+		I_actual	[6],
+		I_control	[6],
+		Tool_vector_actual	[6],
+		TCP_speed_actual	[6],
+		TCP_force	[6],
+		Tool_vector_target	[6],
+		TCP_speed_target[6]	;
+		double Digital_input_bits;
+		double Motor_temperatures[6];
+		double Controller_Timer		,
+		Test_value	,
+		Robot_Mode	;
+		double  Joint_Modes[6];
+		double Safety_Mode	;
+		double UNUSED1[6]	;//6
+		double Tool_Accelerometer_values[3];//3
+		double UNUSED2	[6];//6
+		double Speed_scaling,
+		Linear_momentum_norm,
+		UNUSED3,
+		UNUSED4,
+		V_main	,
+		V_robot,
+		I_robot;
+		double V_actual[6],//6
+		Digital_outputs,
+		Program_state,
+		Elbow_position[3],
+		Elbow_velocity[3],
+		Safety_Status;
+	} ;
+
+#pragma pack(0)
+	data_struct data;
+};
+
+
+
+
 //!This class implements the protocol for controller v3.0 and v3.1.
 /**
  * details here
@@ -150,7 +247,8 @@ private:
 
 
 
-//!This class implements the protocol for controller v3.0 and v3.1.
+
+//!This class implements the protocol for controller Pre-3.0.
 /**
  * details here
  */

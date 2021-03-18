@@ -1,11 +1,12 @@
 #include "URDriverRT_receiver-component.hpp"
+// #include "URDriver_program-component.hpp"
 #include <rtt/Component.hpp>
 #include <iostream>
 using namespace RTT;
 URDriverRT_receiver::URDriverRT_receiver(std::string const& name) : TaskContext(name,PreOperational)
 , prop_address("192.168.1.102")
 , port_number(30003)
-, version_interface("3.0-3.1")
+, version_interface("5.4-5.9")
 , v6(6,0.0)
 {
 	addProperty("port_number",port_number);
@@ -26,15 +27,19 @@ URDriverRT_receiver::URDriverRT_receiver(std::string const& name) : TaskContext(
 }
 
 bool URDriverRT_receiver::configureHook(){
-	if (version_interface== "3.0-3.1")
+
+	if (version_interface== "5.4-5.9")
+		data_pointer=RTdata::Ptr(new RTdataV59());
+	else if (version_interface== "3.0-3.1")
 		data_pointer=RTdata::Ptr(new RTdataV31());
 	else if (version_interface== "Pre-3.0")
-			data_pointer=RTdata::Ptr(new RTdataV18());
+		data_pointer=RTdata::Ptr(new RTdataV18());
 	else{
 
 		Logger::In in(this->getName());
 		log(Error)<<this->getName()<<":version_interface given is "<<version_interface
 				<<" /n/t current accepted values are:"
+				  "/n/t \"5.4 to 5.9\""
 				  "/n/t \"3.0-3.1\""
 				  "/n/t \"Pre-3.0\""
 				<< endlog();
@@ -69,7 +74,6 @@ bool URDriverRT_receiver::configureHook(){
 
 bool URDriverRT_receiver::startHook(){
 
-
 	if( connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
 	{
 		Logger::In in(this->getName());
@@ -77,6 +81,7 @@ bool URDriverRT_receiver::startHook(){
 		return false;
 	}
 	log(Info)<<this->getName()<<": Connection OK!"<< endlog();
+	// std::cout << ": Connection OK!" <<std::endl;
 	//activity set watch
 	act->watch(sockfd);
 	act->setTimeout(2000);
@@ -105,27 +110,52 @@ void URDriverRT_receiver::updateHook()
 	else{
 		if(act->isUpdated(sockfd)){
 
-
 			int bytes_read= data_pointer->readRTData(sockfd);
+
+			// std::cout << "bytes_read:" <<std::endl;
+			// std::cout << bytes_read <<std::endl;
+
 			//todo control on numer of reads
 			double d;
+			// double ddd;
 
 			if (bytes_read==0) return;
+
+			int size; 
+			data_pointer->getNominalSize(size);
+			
+			// std::cout << "size:" <<std::endl;
+			// std::cout << size <<std::endl;
+
+			if (bytes_read != size) {
+				return;
+			}
+
 			int ok=data_pointer->getQ_actual(v6);
-			if (ok==1) q_actual_outport.write(v6);
 
-			ok=data_pointer->getQdot_actual(v6);
-			if (ok==1) qd_actual_outport.write(v6);
+			 //    std::cout << "q_actual_outport:" <<std::endl;
+				// std::cout << v6[0] <<std::endl;
+				// std::cout << v6[1] <<std::endl;
+				// std::cout << v6[2] <<std::endl;
+				// std::cout << v6[3] <<std::endl;
+				// std::cout << v6[4] <<std::endl;
+				// std::cout << v6[5] <<std::endl;
+			
+				if (ok==1) q_actual_outport.write(v6);		
+			
+				ok=data_pointer->getQdot_actual(v6);
+				if (ok==1) qd_actual_outport.write(v6);
 
-			ok=data_pointer->getTime(d);
-			if (ok==1) time_outport.write(d);
+				ok=data_pointer->getTime(d);
+				if (ok==1) time_outport.write(d);
+				
+				// std::cout << "delta time:" <<std::endl;
+				// std::cout << d <<std::endl;
 
 #ifndef NDEBUG
 			cout<<"bites read:\t" << bytes_read <<endl;
 			cout<<"time:\t"<<d<<endl;
 #endif
-
-
 
 		}
 

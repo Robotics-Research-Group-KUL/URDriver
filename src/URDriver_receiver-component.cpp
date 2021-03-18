@@ -3,7 +3,7 @@
 #include <iostream>
 using namespace RTT;
 URDriver_receiver::URDriver_receiver(std::string const& name) : TaskContext(name,PreOperational)
-, port_number(30002)
+, port_number(30002)  // ali: it was 30002
 , prop_address("192.168.1.102")
 , v6(6,0.0)
 {

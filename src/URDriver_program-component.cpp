@@ -8,7 +8,7 @@
 #include <string>     // std::string, std::to_string
 using namespace RTT;
 URDriver_program::URDriver_program(std::string const& name) : TaskContext(name,PreOperational)
-  , port_number(30002)
+  , port_number(30002)     
   , reverse_port_number(50001)
   , prop_address("192.168.1.102")
   , my_address("127.0.0.1")
@@ -210,7 +210,6 @@ bool URDriver_program::startHook(){
 
 
 void URDriver_program::updateHook(){
-
 	signal(SIGPIPE, signal_callback_handler);
 	if(sending_velocity)
 	{
@@ -238,6 +237,18 @@ void URDriver_program::updateHook(){
 			data_frame[1+i]=(int)(qdes[i]*MULT_jointstate);
 		data_frame[7]=(int)(acc_limit*MULT_jointstate);//max acc
 		data_frame[8]=(int)(timeOut*MULT_time);//time
+
+ 		// std::cout << "qdes_updatahook value sent to prog.ur" <<std::endl;
+ 		// std::cout << data_frame[1] <<std::endl;
+ 		// std::cout << data_frame[2] <<std::endl;
+ 		// std::cout << data_frame[3] <<std::endl;
+ 		// std::cout << data_frame[4] <<std::endl;
+ 		// std::cout << data_frame[5] <<std::endl;
+ 		// std::cout << data_frame[6] <<std::endl;
+
+ 		// std::cout << data_frame[7] <<std::endl;
+ 		// std::cout << data_frame[8] <<std::endl;
+
 		if (!send_out(data_frame,9))
 		{
 			Logger::In in(this->getName());
@@ -323,10 +334,6 @@ bool URDriver_program::send_joint_objective(vector<double>q, double time){
 		log(Error)<<this->getName()<<": error send_joint_objective."<< endlog();
 		return false;
 	}
-
-
-
-
 
 	return true;
 }
