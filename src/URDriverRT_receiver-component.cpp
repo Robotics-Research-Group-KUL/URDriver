@@ -39,7 +39,7 @@ bool URDriverRT_receiver::configureHook(){
 		Logger::In in(this->getName());
 		log(Error)<<this->getName()<<":version_interface given is "<<version_interface
 				<<" /n/t current accepted values are:"
-				  "/n/t \"5.4 to 5.9\""
+				  "/n/t \"5.4-5.9\""
 				  "/n/t \"3.0-3.1\""
 				  "/n/t \"Pre-3.0\""
 				<< endlog();
