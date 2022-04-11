@@ -44,6 +44,7 @@ class URDriverRT_receiver : public RTT::TaskContext{
 	///@{
 	RTT::OutputPort<vector<double> > q_actual_outport;
 	RTT::OutputPort<vector<double> > qd_actual_outport;
+	RTT::OutputPort<vector<double> > TCP_force_outport;
 	RTT::OutputPort<double > time_outport;
 	RTT::OutputPort<double > period_outport;
 
