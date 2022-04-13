@@ -14,10 +14,13 @@ URDriverRT_receiver::URDriverRT_receiver(std::string const& name) : TaskContext(
 	addProperty("version_interface",version_interface);
 	addPort("q_actual_outport",q_actual_outport);
 	addPort("qd_actual_outport",qd_actual_outport);
+	addPort("TCP_force_outport",TCP_force_outport);
 	addPort("time_outport",time_outport);
 	addPort("period_outport",period_outport);
 
 	q_actual_outport.setDataSample(v6);
+	TCP_force_outport.setDataSample(v6);
+
 
 
 	act = new RTT::extras::FileDescriptorActivity(os::HighestPriority);
@@ -28,7 +31,9 @@ URDriverRT_receiver::URDriverRT_receiver(std::string const& name) : TaskContext(
 
 bool URDriverRT_receiver::configureHook(){
 
-	if (version_interface== "5.4-5.9")
+	if (version_interface== "5.10-5.11")
+		data_pointer=RTdata::Ptr(new RTdataV511());
+	else if (version_interface== "5.4-5.9")
 		data_pointer=RTdata::Ptr(new RTdataV59());
 	else if (version_interface== "3.0-3.1")
 		data_pointer=RTdata::Ptr(new RTdataV31());
@@ -39,6 +44,7 @@ bool URDriverRT_receiver::configureHook(){
 		Logger::In in(this->getName());
 		log(Error)<<this->getName()<<":version_interface given is "<<version_interface
 				<<" /n/t current accepted values are:"
+				  "/n/t \"5.10-5.11\""
 				  "/n/t \"5.4-5.9\""
 				  "/n/t \"3.0-3.1\""
 				  "/n/t \"Pre-3.0\""
@@ -128,8 +134,13 @@ void URDriverRT_receiver::updateHook()
 			// std::cout << size <<std::endl;
 
 			if (bytes_read != size) {
+				Logger::In in(this->getName());
+				log(Warning)  <<this->getName()<<" socket size is wrong: got "<<bytes_read << " expected: "<<size << endlog();
 				return;
 			}
+			
+				// log(Warning)  <<this->getName()<<" socket size is ok" << endlog();
+				
 
 			int ok=data_pointer->getQ_actual(v6);
 
@@ -146,6 +157,11 @@ void URDriverRT_receiver::updateHook()
 				ok=data_pointer->getQdot_actual(v6);
 				if (ok==1) qd_actual_outport.write(v6);
 
+				ok=data_pointer->getTCP_Force(v6);
+				// std::cout << "TCP_force_outport:" <<std::endl;
+				// std::cout <<v6[0]<<" "<<v6[1]<<" "<<v6[2]<<std::endl;
+				if (ok==1) TCP_force_outport.write(v6);
+				
 				ok=data_pointer->getTime(d);
 				if (ok==1) time_outport.write(d);
 				
