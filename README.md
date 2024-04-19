@@ -1,6 +1,14 @@
 # URDriver
 orocos components for interfacing with UR robots
 
+## Dependencies
+
+Besides ROS and Orocos, the libexplain package is needed:
+
+```sh
+sudo apt-get install libexplain-dev
+```
+
 ## usage
 
 set the pc address in the same subnet of the robot and set such IPs in properties
